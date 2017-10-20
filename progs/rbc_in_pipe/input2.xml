@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+<geometry>
+	<!-- Diameter (lattice units) -->
+	<diameter>42</diameter>
+	<!-- Pipe length -->
+	<length>42</length>
+</geometry>
+<physics>
+	<!-- Channel Reynolds number rho*uMax*d/mu-->
+	<Re_d>0.05</Re_d>
+</physics>
+<particles>
+	<rbc>
+		<mesh>sphere_TRImesh_626n_1248el.msh</mesh>
+		<concentration>0.3</concentration>
+		
+		<!-- The initial sphere mesh is deflated to achieve 
+		a fraction of its volume to obtain the biconcave shape -->
+		<!--<deflate_ratio>0.59</deflate_ratio>-->
+		
+		<!-- Poisson ratio-->
+		<poisson_ratio>0.995</poisson_ratio>
+		
+		<!-- Relative bending stiffness -->
+		<Xi_b>0.006</Xi_b>
+		
+		<!-- Viscosity contrast (RBC inner to outer)-->
+		<lambda>1</lambda>
+		
+		<!-- Capillary number gamma*a_rbc*mu / G-->
+		<Ca>0.5</Ca>
+	</rbc>
+	<platelet>
+		<mesh>sphere_2_2_2_TRImesh_54n_104el.msh</mesh>
+		<Ca>0.01</Ca>
+		<concentration>0.005</concentration>
+	</platelet>
+	<wall_interaction>
+		<!-- available types: none/morse/spring -->
+		<type>morse</type>
+		<r_min>2</r_min>
+		<beta>2</beta>
+		<strength>1e-4</strength>
+	</wall_interaction>
+	<particle_interaction>
+		<!-- available types: none/morse/spring -->
+		<type>morse</type>
+		<r_min>1</r_min>
+		<beta>1</beta>
+		<strength>1e-3</strength>
+	</particle_interaction>
+</particles>
+<numerics>
+	<max_iterations>500000</max_iterations>
+	<tau>1</tau>
+</numerics>
+<checkpoints>
+	<folder>Ca0_5_Re1_d42_l42_lambda1_H0_30_strength1e-3</folder>
+	<start_from_checkpoint>false</start_from_checkpoint>
+	<write_interval>50000</write_interval>
+</checkpoints>
+<output>
+	<folder>Ca0_5_Re1_d42_l42_lambda1_H0_30_strength1e-3</folder>
+	<!--<folder>single_rbc</folder>-->
+	<flow_vtk_interval>1000</flow_vtk_interval>
+	<particle_vtk_interval>1000</particle_vtk_interval>
+	<particle_lw_interval>1000</particle_lw_interval>
+</output>

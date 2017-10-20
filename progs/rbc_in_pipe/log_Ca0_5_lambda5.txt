@@ -1,0 +1,53 @@
+RBC Parameters:
+  Global area stiffness: 0.0732082
+  Local area stiffness: 0.00813424
+  Global volume stiffness: 0.0406712
+  Bending stiffness: 0.00133132
+  In-plane shear stiffness: 0.00019137
+  Equilibrium angle: 0.108354
+  Shear modulus: 0.000412906
+  Area modulus 0.0821682
+  Young's modulus: 0.00164336
+  Area dilation energy 6.51949e-05
+==============
+Non-dimensional parameters:
+  Re_d: 1
+  Re_p: 0.0487209
+  Ca_G: 0.5
+  lambda: 5
+  Relative bending stiffness (kb/GA): 0.006
+  Poisson ratio 0.99
+==============
+Numerics:
+  uMax:0.00396825
+  tau (outer fluid):1
+  tau (inner fluid):3
+==============
+Calibrating RBC shape
+It: 0, total volume = 1169.6 (1169.6), total area = 537.378 (537.378)
+It: 1000, total volume = 1123.41 (1121.69), total area = 535.911 (537.378)
+It: 2000, total volume = 1075.32 (1073.74), total area = 536.017 (537.378)
+It: 3000, total volume = 1027.01 (1025.78), total area = 536.149 (537.378)
+It: 4000, total volume = 978.965 (977.831), total area = 536.24 (537.378)
+It: 5000, total volume = 930.885 (929.878), total area = 536.303 (537.378)
+It: 6000, total volume = 882.812 (881.924), total area = 536.368 (537.378)
+It: 7000, total volume = 834.774 (833.971), total area = 536.423 (537.378)
+It: 8000, total volume = 786.749 (786.017), total area = 536.468 (537.378)
+It: 9000, total volume = 738.732 (738.064), total area = 536.509 (537.378)
+It: 10000, total volume = 690.725 (690.11), total area = 536.544 (537.378)
+It: 11000, total volume = 690.673 (690.062), total area = 536.534 (537.378)
+It: 12000, total volume = 690.666 (690.062), total area = 536.543 (537.378)
+It: 13000, total volume = 690.676 (690.062), total area = 536.544 (537.378)
+It: 14000, total volume = 690.674 (690.062), total area = 536.545 (537.378)
+It: 15000, total volume = 690.675 (690.062), total area = 536.542 (537.378)
+It: 16000, total volume = 690.675 (690.062), total area = 536.543 (537.378)
+It: 17000, total volume = 690.675 (690.062), total area = 536.544 (537.378)
+It: 18000, total volume = 690.675 (690.062), total area = 536.543 (537.378)
+It: 19000, total volume = 690.675 (690.062), total area = 536.543 (537.378)
+It: 20000, total volume = 690.675 (690.062), total area = 536.543 (537.378)
+Creating initial particle distribution
+===============
+Starting coupled ib-lbm iterations
+Iteration 0 / 500000 total volume: 140207
+Writing flow field and particle data at iteration 0
+Iteration 100 / 500000 total volume: 139907

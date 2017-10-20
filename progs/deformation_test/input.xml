@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<forcing>
+	<Nrelax>40000</Nrelax>	<!-- Number of lbm iteration for relaxation after the force increases -->
+	<force_steps>40</force_steps>	<!-- Number of force incremens from min_force to max_force -->
+	<min_force>0</min_force>  <!-- [N] -->
+	<max_force>200e-12</max_force> <!-- [N] -->
+	<node_fraction>0.02</node_fraction> <!-- fraction of membrane nodes that the force will be applied to -->
+</forcing>
+<units>
+	<tau>4</tau>
+	<dx>0.5e-6</dx>
+	<nu_plasma>1.46e-6</nu_plasma>
+	<rho_plasma>1025</rho_plasma>
+</units>
+<rbc>
+	<shear_modulus>6e-6</shear_modulus>
+	<bending_energy>4e-18</bending_energy>
+	<poisson_ratio>0.995</poisson_ratio>
+	<lambda>1</lambda>	<!-- Viscosity ratio-->
+	<mesh>sphere_TRImesh_626n_1248el.msh</mesh>
+	<deflation_factor>0.59</deflation_factor>
+</rbc>
+<output>
+	<folder>deformation_G6_Kb4e-18</folder>
+</output>

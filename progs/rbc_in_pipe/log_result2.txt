@@ -1,0 +1,1162 @@
+RBC Parameters:
+  Global area stiffness: 0.366041
+  Local area stiffness: 0.0406712
+  Global volume stiffness: 0.203356
+  Bending stiffness: 0.00665659
+  In-plane shear stiffness: 0.000956849
+  Equilibrium angle: 0.108354
+  Shear modulus: 0.00206453
+  Area modulus 0.410841
+  Young's modulus: 0.00821682
+  Area dilation energy 0.000325974
+==============
+Non-dimensional parameters:
+  Re_d: 1
+  Re_p: 0.0487209
+  Ca_G: 0.1
+  lambda: 5
+  Relative bending stiffness (kb/GA): 0.006
+  Poisson ratio 0.99
+==============
+Numerics:
+  uMax:0.00396825
+  tau (outer fluid):1
+  tau (inner fluid):3
+==============
+Calibrating RBC shape
+It: 0, total volume = 1169.6 (1169.6), total area = 537.378 (537.378)
+It: 1000, total volume = 1123.71 (1121.69), total area = 535.712 (537.378)
+It: 2000, total volume = 1075.2 (1073.74), total area = 535.958 (537.378)
+It: 3000, total volume = 1027.05 (1025.78), total area = 536.128 (537.378)
+It: 4000, total volume = 978.946 (977.831), total area = 536.25 (537.378)
+It: 5000, total volume = 930.848 (929.878), total area = 536.304 (537.378)
+It: 6000, total volume = 882.809 (881.924), total area = 536.373 (537.378)
+It: 7000, total volume = 834.77 (833.971), total area = 536.427 (537.378)
+It: 8000, total volume = 786.747 (786.017), total area = 536.468 (537.378)
+It: 9000, total volume = 738.733 (738.064), total area = 536.509 (537.378)
+It: 10000, total volume = 690.726 (690.11), total area = 536.545 (537.378)
+It: 11000, total volume = 690.675 (690.062), total area = 536.546 (537.378)
+It: 12000, total volume = 690.672 (690.062), total area = 536.545 (537.378)
+It: 13000, total volume = 690.675 (690.062), total area = 536.541 (537.378)
+It: 14000, total volume = 690.673 (690.062), total area = 536.543 (537.378)
+It: 15000, total volume = 690.676 (690.062), total area = 536.542 (537.378)
+It: 16000, total volume = 690.675 (690.062), total area = 536.543 (537.378)
+It: 17000, total volume = 690.675 (690.062), total area = 536.543 (537.378)
+It: 18000, total volume = 690.675 (690.062), total area = 536.543 (537.378)
+It: 19000, total volume = 690.675 (690.062), total area = 536.543 (537.378)
+It: 20000, total volume = 690.675 (690.062), total area = 536.543 (537.378)
+Creating initial particle distribution
+===============
+Starting coupled ib-lbm iterations
+Iteration 0 / 100000 total volume: 140207
+Writing flow field and particle data at iteration 0
+Iteration 100 / 100000 total volume: 139984
+Iteration 200 / 100000 total volume: 139971
+Iteration 300 / 100000 total volume: 139975
+Iteration 400 / 100000 total volume: 139988
+Iteration 500 / 100000 total volume: 140004
+Iteration 600 / 100000 total volume: 140021
+Iteration 700 / 100000 total volume: 140038
+Iteration 800 / 100000 total volume: 140055
+Iteration 900 / 100000 total volume: 140071
+Iteration 1000 / 100000 total volume: 140085
+Writing flow field and particle data at iteration 1000
+Iteration 1100 / 100000 total volume: 140097
+Iteration 1200 / 100000 total volume: 140109
+Iteration 1300 / 100000 total volume: 140119
+Iteration 1400 / 100000 total volume: 140129
+Iteration 1500 / 100000 total volume: 140137
+Iteration 1600 / 100000 total volume: 140144
+Iteration 1700 / 100000 total volume: 140151
+Iteration 1800 / 100000 total volume: 140156
+Iteration 1900 / 100000 total volume: 140161
+Iteration 2000 / 100000 total volume: 140166
+Writing flow field and particle data at iteration 2000
+Iteration 2100 / 100000 total volume: 140170
+Iteration 2200 / 100000 total volume: 140173
+Iteration 2300 / 100000 total volume: 140176
+Iteration 2400 / 100000 total volume: 140179
+Iteration 2500 / 100000 total volume: 140181
+Iteration 2600 / 100000 total volume: 140183
+Iteration 2700 / 100000 total volume: 140185
+Iteration 2800 / 100000 total volume: 140186
+Iteration 2900 / 100000 total volume: 140187
+Iteration 3000 / 100000 total volume: 140188
+Writing flow field and particle data at iteration 3000
+Iteration 3100 / 100000 total volume: 140189
+Iteration 3200 / 100000 total volume: 140190
+Iteration 3300 / 100000 total volume: 140191
+Iteration 3400 / 100000 total volume: 140191
+Iteration 3500 / 100000 total volume: 140192
+Iteration 3600 / 100000 total volume: 140192
+Iteration 3700 / 100000 total volume: 140193
+Iteration 3800 / 100000 total volume: 140193
+Iteration 3900 / 100000 total volume: 140193
+Iteration 4000 / 100000 total volume: 140193
+Writing flow field and particle data at iteration 4000
+Iteration 4100 / 100000 total volume: 140193
+Iteration 4200 / 100000 total volume: 140194
+Iteration 4300 / 100000 total volume: 140194
+Iteration 4400 / 100000 total volume: 140194
+Iteration 4500 / 100000 total volume: 140194
+Iteration 4600 / 100000 total volume: 140194
+Iteration 4700 / 100000 total volume: 140194
+Iteration 4800 / 100000 total volume: 140193
+Iteration 4900 / 100000 total volume: 140193
+Iteration 5000 / 100000 total volume: 140193
+Writing flow field and particle data at iteration 5000
+Iteration 5100 / 100000 total volume: 140193
+Iteration 5200 / 100000 total volume: 140193
+Iteration 5300 / 100000 total volume: 140193
+Iteration 5400 / 100000 total volume: 140193
+Iteration 5500 / 100000 total volume: 140193
+Iteration 5600 / 100000 total volume: 140193
+Iteration 5700 / 100000 total volume: 140192
+Iteration 5800 / 100000 total volume: 140192
+Iteration 5900 / 100000 total volume: 140192
+Iteration 6000 / 100000 total volume: 140192
+Writing flow field and particle data at iteration 6000
+Iteration 6100 / 100000 total volume: 140192
+Iteration 6200 / 100000 total volume: 140192
+Iteration 6300 / 100000 total volume: 140192
+Iteration 6400 / 100000 total volume: 140191
+Iteration 6500 / 100000 total volume: 140191
+Iteration 6600 / 100000 total volume: 140191
+Iteration 6700 / 100000 total volume: 140191
+Iteration 6800 / 100000 total volume: 140191
+Iteration 6900 / 100000 total volume: 140191
+Iteration 7000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 7000
+Iteration 7100 / 100000 total volume: 140190
+Iteration 7200 / 100000 total volume: 140190
+Iteration 7300 / 100000 total volume: 140190
+Iteration 7400 / 100000 total volume: 140190
+Iteration 7500 / 100000 total volume: 140190
+Iteration 7600 / 100000 total volume: 140190
+Iteration 7700 / 100000 total volume: 140189
+Iteration 7800 / 100000 total volume: 140189
+Iteration 7900 / 100000 total volume: 140189
+Iteration 8000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 8000
+Iteration 8100 / 100000 total volume: 140189
+Iteration 8200 / 100000 total volume: 140189
+Iteration 8300 / 100000 total volume: 140189
+Iteration 8400 / 100000 total volume: 140189
+Iteration 8500 / 100000 total volume: 140189
+Iteration 8600 / 100000 total volume: 140188
+Iteration 8700 / 100000 total volume: 140188
+Iteration 8800 / 100000 total volume: 140188
+Iteration 8900 / 100000 total volume: 140188
+Iteration 9000 / 100000 total volume: 140188
+Writing flow field and particle data at iteration 9000
+Iteration 9100 / 100000 total volume: 140188
+Iteration 9200 / 100000 total volume: 140188
+Iteration 9300 / 100000 total volume: 140188
+Iteration 9400 / 100000 total volume: 140188
+Iteration 9500 / 100000 total volume: 140188
+Iteration 9600 / 100000 total volume: 140188
+Iteration 9700 / 100000 total volume: 140188
+Iteration 9800 / 100000 total volume: 140187
+Iteration 9900 / 100000 total volume: 140187
+Iteration 10000 / 100000 total volume: 140187
+Writing checkpoint
+Writing flow field and particle data at iteration 10000
+Iteration 10100 / 100000 total volume: 140187
+Iteration 10200 / 100000 total volume: 140187
+Iteration 10300 / 100000 total volume: 140187
+Iteration 10400 / 100000 total volume: 140187
+Iteration 10500 / 100000 total volume: 140187
+Iteration 10600 / 100000 total volume: 140187
+Iteration 10700 / 100000 total volume: 140187
+Iteration 10800 / 100000 total volume: 140187
+Iteration 10900 / 100000 total volume: 140187
+Iteration 11000 / 100000 total volume: 140187
+Writing flow field and particle data at iteration 11000
+Iteration 11100 / 100000 total volume: 140187
+Iteration 11200 / 100000 total volume: 140187
+Iteration 11300 / 100000 total volume: 140187
+Iteration 11400 / 100000 total volume: 140187
+Iteration 11500 / 100000 total volume: 140187
+Iteration 11600 / 100000 total volume: 140187
+Iteration 11700 / 100000 total volume: 140187
+Iteration 11800 / 100000 total volume: 140187
+Iteration 11900 / 100000 total volume: 140187
+Iteration 12000 / 100000 total volume: 140187
+Writing flow field and particle data at iteration 12000
+Iteration 12100 / 100000 total volume: 140187
+Iteration 12200 / 100000 total volume: 140187
+Iteration 12300 / 100000 total volume: 140187
+Iteration 12400 / 100000 total volume: 140187
+Iteration 12500 / 100000 total volume: 140187
+Iteration 12600 / 100000 total volume: 140187
+Iteration 12700 / 100000 total volume: 140187
+Iteration 12800 / 100000 total volume: 140187
+Iteration 12900 / 100000 total volume: 140187
+Iteration 13000 / 100000 total volume: 140187
+Writing flow field and particle data at iteration 13000
+Iteration 13100 / 100000 total volume: 140187
+Iteration 13200 / 100000 total volume: 140187
+Iteration 13300 / 100000 total volume: 140187
+Iteration 13400 / 100000 total volume: 140187
+Iteration 13500 / 100000 total volume: 140187
+Iteration 13600 / 100000 total volume: 140187
+Iteration 13700 / 100000 total volume: 140187
+Iteration 13800 / 100000 total volume: 140187
+Iteration 13900 / 100000 total volume: 140187
+Iteration 14000 / 100000 total volume: 140187
+Writing flow field and particle data at iteration 14000
+Iteration 14100 / 100000 total volume: 140187
+Iteration 14200 / 100000 total volume: 140187
+Iteration 14300 / 100000 total volume: 140187
+Iteration 14400 / 100000 total volume: 140187
+Iteration 14500 / 100000 total volume: 140187
+Iteration 14600 / 100000 total volume: 140187
+Iteration 14700 / 100000 total volume: 140187
+Iteration 14800 / 100000 total volume: 140187
+Iteration 14900 / 100000 total volume: 140187
+Iteration 15000 / 100000 total volume: 140187
+Writing flow field and particle data at iteration 15000
+Iteration 15100 / 100000 total volume: 140187
+Iteration 15200 / 100000 total volume: 140187
+Iteration 15300 / 100000 total volume: 140187
+Iteration 15400 / 100000 total volume: 140187
+Iteration 15500 / 100000 total volume: 140187
+Iteration 15600 / 100000 total volume: 140187
+Iteration 15700 / 100000 total volume: 140187
+Iteration 15800 / 100000 total volume: 140187
+Iteration 15900 / 100000 total volume: 140187
+Iteration 16000 / 100000 total volume: 140187
+Writing flow field and particle data at iteration 16000
+Iteration 16100 / 100000 total volume: 140187
+Iteration 16200 / 100000 total volume: 140187
+Iteration 16300 / 100000 total volume: 140187
+Iteration 16400 / 100000 total volume: 140187
+Iteration 16500 / 100000 total volume: 140187
+Iteration 16600 / 100000 total volume: 140187
+Iteration 16700 / 100000 total volume: 140187
+Iteration 16800 / 100000 total volume: 140187
+Iteration 16900 / 100000 total volume: 140187
+Iteration 17000 / 100000 total volume: 140187
+Writing flow field and particle data at iteration 17000
+Iteration 17100 / 100000 total volume: 140187
+Iteration 17200 / 100000 total volume: 140187
+Iteration 17300 / 100000 total volume: 140187
+Iteration 17400 / 100000 total volume: 140188
+Iteration 17500 / 100000 total volume: 140188
+Iteration 17600 / 100000 total volume: 140188
+Iteration 17700 / 100000 total volume: 140188
+Iteration 17800 / 100000 total volume: 140188
+Iteration 17900 / 100000 total volume: 140188
+Iteration 18000 / 100000 total volume: 140188
+Writing flow field and particle data at iteration 18000
+Iteration 18100 / 100000 total volume: 140188
+Iteration 18200 / 100000 total volume: 140188
+Iteration 18300 / 100000 total volume: 140188
+Iteration 18400 / 100000 total volume: 140188
+Iteration 18500 / 100000 total volume: 140188
+Iteration 18600 / 100000 total volume: 140188
+Iteration 18700 / 100000 total volume: 140188
+Iteration 18800 / 100000 total volume: 140188
+Iteration 18900 / 100000 total volume: 140188
+Iteration 19000 / 100000 total volume: 140188
+Writing flow field and particle data at iteration 19000
+Iteration 19100 / 100000 total volume: 140188
+Iteration 19200 / 100000 total volume: 140188
+Iteration 19300 / 100000 total volume: 140188
+Iteration 19400 / 100000 total volume: 140188
+Iteration 19500 / 100000 total volume: 140188
+Iteration 19600 / 100000 total volume: 140188
+Iteration 19700 / 100000 total volume: 140188
+Iteration 19800 / 100000 total volume: 140188
+Iteration 19900 / 100000 total volume: 140188
+Iteration 20000 / 100000 total volume: 140188
+Writing checkpoint
+Writing flow field and particle data at iteration 20000
+Iteration 20100 / 100000 total volume: 140188
+Iteration 20200 / 100000 total volume: 140188
+Iteration 20300 / 100000 total volume: 140188
+Iteration 20400 / 100000 total volume: 140188
+Iteration 20500 / 100000 total volume: 140188
+Iteration 20600 / 100000 total volume: 140188
+Iteration 20700 / 100000 total volume: 140188
+Iteration 20800 / 100000 total volume: 140188
+Iteration 20900 / 100000 total volume: 140188
+Iteration 21000 / 100000 total volume: 140188
+Writing flow field and particle data at iteration 21000
+Iteration 21100 / 100000 total volume: 140188
+Iteration 21200 / 100000 total volume: 140188
+Iteration 21300 / 100000 total volume: 140189
+Iteration 21400 / 100000 total volume: 140189
+Iteration 21500 / 100000 total volume: 140189
+Iteration 21600 / 100000 total volume: 140189
+Iteration 21700 / 100000 total volume: 140189
+Iteration 21800 / 100000 total volume: 140189
+Iteration 21900 / 100000 total volume: 140189
+Iteration 22000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 22000
+Iteration 22100 / 100000 total volume: 140189
+Iteration 22200 / 100000 total volume: 140189
+Iteration 22300 / 100000 total volume: 140189
+Iteration 22400 / 100000 total volume: 140189
+Iteration 22500 / 100000 total volume: 140189
+Iteration 22600 / 100000 total volume: 140189
+Iteration 22700 / 100000 total volume: 140189
+Iteration 22800 / 100000 total volume: 140189
+Iteration 22900 / 100000 total volume: 140189
+Iteration 23000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 23000
+Iteration 23100 / 100000 total volume: 140189
+Iteration 23200 / 100000 total volume: 140189
+Iteration 23300 / 100000 total volume: 140189
+Iteration 23400 / 100000 total volume: 140189
+Iteration 23500 / 100000 total volume: 140189
+Iteration 23600 / 100000 total volume: 140189
+Iteration 23700 / 100000 total volume: 140189
+Iteration 23800 / 100000 total volume: 140189
+Iteration 23900 / 100000 total volume: 140189
+Iteration 24000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 24000
+Iteration 24100 / 100000 total volume: 140189
+Iteration 24200 / 100000 total volume: 140189
+Iteration 24300 / 100000 total volume: 140189
+Iteration 24400 / 100000 total volume: 140189
+Iteration 24500 / 100000 total volume: 140189
+Iteration 24600 / 100000 total volume: 140189
+Iteration 24700 / 100000 total volume: 140189
+Iteration 24800 / 100000 total volume: 140189
+Iteration 24900 / 100000 total volume: 140189
+Iteration 25000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 25000
+Iteration 25100 / 100000 total volume: 140189
+Iteration 25200 / 100000 total volume: 140189
+Iteration 25300 / 100000 total volume: 140189
+Iteration 25400 / 100000 total volume: 140189
+Iteration 25500 / 100000 total volume: 140189
+Iteration 25600 / 100000 total volume: 140189
+Iteration 25700 / 100000 total volume: 140189
+Iteration 25800 / 100000 total volume: 140189
+Iteration 25900 / 100000 total volume: 140189
+Iteration 26000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 26000
+Iteration 26100 / 100000 total volume: 140189
+Iteration 26200 / 100000 total volume: 140189
+Iteration 26300 / 100000 total volume: 140190
+Iteration 26400 / 100000 total volume: 140190
+Iteration 26500 / 100000 total volume: 140190
+Iteration 26600 / 100000 total volume: 140190
+Iteration 26700 / 100000 total volume: 140190
+Iteration 26800 / 100000 total volume: 140190
+Iteration 26900 / 100000 total volume: 140190
+Iteration 27000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 27000
+Iteration 27100 / 100000 total volume: 140190
+Iteration 27200 / 100000 total volume: 140190
+Iteration 27300 / 100000 total volume: 140190
+Iteration 27400 / 100000 total volume: 140190
+Iteration 27500 / 100000 total volume: 140190
+Iteration 27600 / 100000 total volume: 140190
+Iteration 27700 / 100000 total volume: 140190
+Iteration 27800 / 100000 total volume: 140190
+Iteration 27900 / 100000 total volume: 140190
+Iteration 28000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 28000
+Iteration 28100 / 100000 total volume: 140190
+Iteration 28200 / 100000 total volume: 140190
+Iteration 28300 / 100000 total volume: 140190
+Iteration 28400 / 100000 total volume: 140190
+Iteration 28500 / 100000 total volume: 140190
+Iteration 28600 / 100000 total volume: 140190
+Iteration 28700 / 100000 total volume: 140190
+Iteration 28800 / 100000 total volume: 140190
+Iteration 28900 / 100000 total volume: 140190
+Iteration 29000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 29000
+Iteration 29100 / 100000 total volume: 140190
+Iteration 29200 / 100000 total volume: 140190
+Iteration 29300 / 100000 total volume: 140190
+Iteration 29400 / 100000 total volume: 140190
+Iteration 29500 / 100000 total volume: 140190
+Iteration 29600 / 100000 total volume: 140190
+Iteration 29700 / 100000 total volume: 140190
+Iteration 29800 / 100000 total volume: 140190
+Iteration 29900 / 100000 total volume: 140190
+Iteration 30000 / 100000 total volume: 140190
+Writing checkpoint
+Writing flow field and particle data at iteration 30000
+Iteration 30100 / 100000 total volume: 140190
+Iteration 30200 / 100000 total volume: 140190
+Iteration 30300 / 100000 total volume: 140190
+Iteration 30400 / 100000 total volume: 140190
+Iteration 30500 / 100000 total volume: 140190
+Iteration 30600 / 100000 total volume: 140190
+Iteration 30700 / 100000 total volume: 140190
+Iteration 30800 / 100000 total volume: 140190
+Iteration 30900 / 100000 total volume: 140190
+Iteration 31000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 31000
+Iteration 31100 / 100000 total volume: 140190
+Iteration 31200 / 100000 total volume: 140190
+Iteration 31300 / 100000 total volume: 140190
+Iteration 31400 / 100000 total volume: 140190
+Iteration 31500 / 100000 total volume: 140190
+Iteration 31600 / 100000 total volume: 140190
+Iteration 31700 / 100000 total volume: 140190
+Iteration 31800 / 100000 total volume: 140190
+Iteration 31900 / 100000 total volume: 140190
+Iteration 32000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 32000
+Iteration 32100 / 100000 total volume: 140190
+Iteration 32200 / 100000 total volume: 140190
+Iteration 32300 / 100000 total volume: 140190
+Iteration 32400 / 100000 total volume: 140190
+Iteration 32500 / 100000 total volume: 140190
+Iteration 32600 / 100000 total volume: 140190
+Iteration 32700 / 100000 total volume: 140190
+Iteration 32800 / 100000 total volume: 140190
+Iteration 32900 / 100000 total volume: 140190
+Iteration 33000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 33000
+Iteration 33100 / 100000 total volume: 140190
+Iteration 33200 / 100000 total volume: 140190
+Iteration 33300 / 100000 total volume: 140190
+Iteration 33400 / 100000 total volume: 140190
+Iteration 33500 / 100000 total volume: 140190
+Iteration 33600 / 100000 total volume: 140190
+Iteration 33700 / 100000 total volume: 140190
+Iteration 33800 / 100000 total volume: 140190
+Iteration 33900 / 100000 total volume: 140190
+Iteration 34000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 34000
+Iteration 34100 / 100000 total volume: 140190
+Iteration 34200 / 100000 total volume: 140190
+Iteration 34300 / 100000 total volume: 140190
+Iteration 34400 / 100000 total volume: 140190
+Iteration 34500 / 100000 total volume: 140190
+Iteration 34600 / 100000 total volume: 140190
+Iteration 34700 / 100000 total volume: 140190
+Iteration 34800 / 100000 total volume: 140190
+Iteration 34900 / 100000 total volume: 140190
+Iteration 35000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 35000
+Iteration 35100 / 100000 total volume: 140190
+Iteration 35200 / 100000 total volume: 140190
+Iteration 35300 / 100000 total volume: 140190
+Iteration 35400 / 100000 total volume: 140190
+Iteration 35500 / 100000 total volume: 140190
+Iteration 35600 / 100000 total volume: 140190
+Iteration 35700 / 100000 total volume: 140190
+Iteration 35800 / 100000 total volume: 140190
+Iteration 35900 / 100000 total volume: 140190
+Iteration 36000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 36000
+Iteration 36100 / 100000 total volume: 140190
+Iteration 36200 / 100000 total volume: 140190
+Iteration 36300 / 100000 total volume: 140190
+Iteration 36400 / 100000 total volume: 140190
+Iteration 36500 / 100000 total volume: 140190
+Iteration 36600 / 100000 total volume: 140190
+Iteration 36700 / 100000 total volume: 140190
+Iteration 36800 / 100000 total volume: 140190
+Iteration 36900 / 100000 total volume: 140190
+Iteration 37000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 37000
+Iteration 37100 / 100000 total volume: 140190
+Iteration 37200 / 100000 total volume: 140190
+Iteration 37300 / 100000 total volume: 140190
+Iteration 37400 / 100000 total volume: 140190
+Iteration 37500 / 100000 total volume: 140190
+Iteration 37600 / 100000 total volume: 140190
+Iteration 37700 / 100000 total volume: 140190
+Iteration 37800 / 100000 total volume: 140190
+Iteration 37900 / 100000 total volume: 140190
+Iteration 38000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 38000
+Iteration 38100 / 100000 total volume: 140190
+Iteration 38200 / 100000 total volume: 140190
+Iteration 38300 / 100000 total volume: 140190
+Iteration 38400 / 100000 total volume: 140190
+Iteration 38500 / 100000 total volume: 140190
+Iteration 38600 / 100000 total volume: 140190
+Iteration 38700 / 100000 total volume: 140190
+Iteration 38800 / 100000 total volume: 140190
+Iteration 38900 / 100000 total volume: 140190
+Iteration 39000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 39000
+Iteration 39100 / 100000 total volume: 140190
+Iteration 39200 / 100000 total volume: 140190
+Iteration 39300 / 100000 total volume: 140190
+Iteration 39400 / 100000 total volume: 140190
+Iteration 39500 / 100000 total volume: 140190
+Iteration 39600 / 100000 total volume: 140190
+Iteration 39700 / 100000 total volume: 140190
+Iteration 39800 / 100000 total volume: 140190
+Iteration 39900 / 100000 total volume: 140190
+Iteration 40000 / 100000 total volume: 140190
+Writing checkpoint
+Writing flow field and particle data at iteration 40000
+Iteration 40100 / 100000 total volume: 140190
+Iteration 40200 / 100000 total volume: 140190
+Iteration 40300 / 100000 total volume: 140190
+Iteration 40400 / 100000 total volume: 140190
+Iteration 40500 / 100000 total volume: 140190
+Iteration 40600 / 100000 total volume: 140190
+Iteration 40700 / 100000 total volume: 140190
+Iteration 40800 / 100000 total volume: 140190
+Iteration 40900 / 100000 total volume: 140190
+Iteration 41000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 41000
+Iteration 41100 / 100000 total volume: 140190
+Iteration 41200 / 100000 total volume: 140190
+Iteration 41300 / 100000 total volume: 140190
+Iteration 41400 / 100000 total volume: 140190
+Iteration 41500 / 100000 total volume: 140190
+Iteration 41600 / 100000 total volume: 140190
+Iteration 41700 / 100000 total volume: 140190
+Iteration 41800 / 100000 total volume: 140190
+Iteration 41900 / 100000 total volume: 140190
+Iteration 42000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 42000
+Iteration 42100 / 100000 total volume: 140190
+Iteration 42200 / 100000 total volume: 140190
+Iteration 42300 / 100000 total volume: 140190
+Iteration 42400 / 100000 total volume: 140190
+Iteration 42500 / 100000 total volume: 140190
+Iteration 42600 / 100000 total volume: 140190
+Iteration 42700 / 100000 total volume: 140190
+Iteration 42800 / 100000 total volume: 140190
+Iteration 42900 / 100000 total volume: 140190
+Iteration 43000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 43000
+Iteration 43100 / 100000 total volume: 140190
+Iteration 43200 / 100000 total volume: 140190
+Iteration 43300 / 100000 total volume: 140190
+Iteration 43400 / 100000 total volume: 140190
+Iteration 43500 / 100000 total volume: 140190
+Iteration 43600 / 100000 total volume: 140190
+Iteration 43700 / 100000 total volume: 140190
+Iteration 43800 / 100000 total volume: 140190
+Iteration 43900 / 100000 total volume: 140190
+Iteration 44000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 44000
+Iteration 44100 / 100000 total volume: 140190
+Iteration 44200 / 100000 total volume: 140190
+Iteration 44300 / 100000 total volume: 140190
+Iteration 44400 / 100000 total volume: 140190
+Iteration 44500 / 100000 total volume: 140190
+Iteration 44600 / 100000 total volume: 140190
+Iteration 44700 / 100000 total volume: 140190
+Iteration 44800 / 100000 total volume: 140190
+Iteration 44900 / 100000 total volume: 140190
+Iteration 45000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 45000
+Iteration 45100 / 100000 total volume: 140190
+Iteration 45200 / 100000 total volume: 140190
+Iteration 45300 / 100000 total volume: 140190
+Iteration 45400 / 100000 total volume: 140190
+Iteration 45500 / 100000 total volume: 140190
+Iteration 45600 / 100000 total volume: 140190
+Iteration 45700 / 100000 total volume: 140190
+Iteration 45800 / 100000 total volume: 140190
+Iteration 45900 / 100000 total volume: 140190
+Iteration 46000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 46000
+Iteration 46100 / 100000 total volume: 140190
+Iteration 46200 / 100000 total volume: 140190
+Iteration 46300 / 100000 total volume: 140190
+Iteration 46400 / 100000 total volume: 140190
+Iteration 46500 / 100000 total volume: 140190
+Iteration 46600 / 100000 total volume: 140190
+Iteration 46700 / 100000 total volume: 140190
+Iteration 46800 / 100000 total volume: 140190
+Iteration 46900 / 100000 total volume: 140190
+Iteration 47000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 47000
+Iteration 47100 / 100000 total volume: 140190
+Iteration 47200 / 100000 total volume: 140190
+Iteration 47300 / 100000 total volume: 140190
+Iteration 47400 / 100000 total volume: 140190
+Iteration 47500 / 100000 total volume: 140190
+Iteration 47600 / 100000 total volume: 140190
+Iteration 47700 / 100000 total volume: 140190
+Iteration 47800 / 100000 total volume: 140190
+Iteration 47900 / 100000 total volume: 140190
+Iteration 48000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 48000
+Iteration 48100 / 100000 total volume: 140190
+Iteration 48200 / 100000 total volume: 140190
+Iteration 48300 / 100000 total volume: 140190
+Iteration 48400 / 100000 total volume: 140190
+Iteration 48500 / 100000 total volume: 140190
+Iteration 48600 / 100000 total volume: 140190
+Iteration 48700 / 100000 total volume: 140190
+Iteration 48800 / 100000 total volume: 140190
+Iteration 48900 / 100000 total volume: 140190
+Iteration 49000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 49000
+Iteration 49100 / 100000 total volume: 140190
+Iteration 49200 / 100000 total volume: 140190
+Iteration 49300 / 100000 total volume: 140190
+Iteration 49400 / 100000 total volume: 140190
+Iteration 49500 / 100000 total volume: 140190
+Iteration 49600 / 100000 total volume: 140190
+Iteration 49700 / 100000 total volume: 140190
+Iteration 49800 / 100000 total volume: 140190
+Iteration 49900 / 100000 total volume: 140190
+Iteration 50000 / 100000 total volume: 140190
+Writing checkpoint
+Writing flow field and particle data at iteration 50000
+Iteration 50100 / 100000 total volume: 140190
+Iteration 50200 / 100000 total volume: 140190
+Iteration 50300 / 100000 total volume: 140190
+Iteration 50400 / 100000 total volume: 140190
+Iteration 50500 / 100000 total volume: 140190
+Iteration 50600 / 100000 total volume: 140190
+Iteration 50700 / 100000 total volume: 140190
+Iteration 50800 / 100000 total volume: 140190
+Iteration 50900 / 100000 total volume: 140190
+Iteration 51000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 51000
+Iteration 51100 / 100000 total volume: 140190
+Iteration 51200 / 100000 total volume: 140190
+Iteration 51300 / 100000 total volume: 140190
+Iteration 51400 / 100000 total volume: 140190
+Iteration 51500 / 100000 total volume: 140190
+Iteration 51600 / 100000 total volume: 140190
+Iteration 51700 / 100000 total volume: 140190
+Iteration 51800 / 100000 total volume: 140190
+Iteration 51900 / 100000 total volume: 140190
+Iteration 52000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 52000
+Iteration 52100 / 100000 total volume: 140190
+Iteration 52200 / 100000 total volume: 140190
+Iteration 52300 / 100000 total volume: 140190
+Iteration 52400 / 100000 total volume: 140190
+Iteration 52500 / 100000 total volume: 140190
+Iteration 52600 / 100000 total volume: 140190
+Iteration 52700 / 100000 total volume: 140190
+Iteration 52800 / 100000 total volume: 140190
+Iteration 52900 / 100000 total volume: 140190
+Iteration 53000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 53000
+Iteration 53100 / 100000 total volume: 140190
+Iteration 53200 / 100000 total volume: 140190
+Iteration 53300 / 100000 total volume: 140190
+Iteration 53400 / 100000 total volume: 140190
+Iteration 53500 / 100000 total volume: 140190
+Iteration 53600 / 100000 total volume: 140190
+Iteration 53700 / 100000 total volume: 140190
+Iteration 53800 / 100000 total volume: 140190
+Iteration 53900 / 100000 total volume: 140190
+Iteration 54000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 54000
+Iteration 54100 / 100000 total volume: 140189
+Iteration 54200 / 100000 total volume: 140189
+Iteration 54300 / 100000 total volume: 140189
+Iteration 54400 / 100000 total volume: 140189
+Iteration 54500 / 100000 total volume: 140189
+Iteration 54600 / 100000 total volume: 140189
+Iteration 54700 / 100000 total volume: 140189
+Iteration 54800 / 100000 total volume: 140189
+Iteration 54900 / 100000 total volume: 140189
+Iteration 55000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 55000
+Iteration 55100 / 100000 total volume: 140189
+Iteration 55200 / 100000 total volume: 140189
+Iteration 55300 / 100000 total volume: 140189
+Iteration 55400 / 100000 total volume: 140189
+Iteration 55500 / 100000 total volume: 140189
+Iteration 55600 / 100000 total volume: 140189
+Iteration 55700 / 100000 total volume: 140189
+Iteration 55800 / 100000 total volume: 140189
+Iteration 55900 / 100000 total volume: 140189
+Iteration 56000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 56000
+Iteration 56100 / 100000 total volume: 140189
+Iteration 56200 / 100000 total volume: 140189
+Iteration 56300 / 100000 total volume: 140189
+Iteration 56400 / 100000 total volume: 140189
+Iteration 56500 / 100000 total volume: 140189
+Iteration 56600 / 100000 total volume: 140189
+Iteration 56700 / 100000 total volume: 140189
+Iteration 56800 / 100000 total volume: 140189
+Iteration 56900 / 100000 total volume: 140189
+Iteration 57000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 57000
+Iteration 57100 / 100000 total volume: 140189
+Iteration 57200 / 100000 total volume: 140189
+Iteration 57300 / 100000 total volume: 140189
+Iteration 57400 / 100000 total volume: 140189
+Iteration 57500 / 100000 total volume: 140189
+Iteration 57600 / 100000 total volume: 140189
+Iteration 57700 / 100000 total volume: 140189
+Iteration 57800 / 100000 total volume: 140189
+Iteration 57900 / 100000 total volume: 140189
+Iteration 58000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 58000
+Iteration 58100 / 100000 total volume: 140189
+Iteration 58200 / 100000 total volume: 140189
+Iteration 58300 / 100000 total volume: 140189
+Iteration 58400 / 100000 total volume: 140189
+Iteration 58500 / 100000 total volume: 140189
+Iteration 58600 / 100000 total volume: 140189
+Iteration 58700 / 100000 total volume: 140189
+Iteration 58800 / 100000 total volume: 140189
+Iteration 58900 / 100000 total volume: 140189
+Iteration 59000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 59000
+Iteration 59100 / 100000 total volume: 140189
+Iteration 59200 / 100000 total volume: 140189
+Iteration 59300 / 100000 total volume: 140189
+Iteration 59400 / 100000 total volume: 140189
+Iteration 59500 / 100000 total volume: 140189
+Iteration 59600 / 100000 total volume: 140189
+Iteration 59700 / 100000 total volume: 140189
+Iteration 59800 / 100000 total volume: 140189
+Iteration 59900 / 100000 total volume: 140189
+Iteration 60000 / 100000 total volume: 140189
+Writing checkpoint
+Writing flow field and particle data at iteration 60000
+Iteration 60100 / 100000 total volume: 140189
+Iteration 60200 / 100000 total volume: 140189
+Iteration 60300 / 100000 total volume: 140189
+Iteration 60400 / 100000 total volume: 140189
+Iteration 60500 / 100000 total volume: 140189
+Iteration 60600 / 100000 total volume: 140189
+Iteration 60700 / 100000 total volume: 140189
+Iteration 60800 / 100000 total volume: 140189
+Iteration 60900 / 100000 total volume: 140189
+Iteration 61000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 61000
+Iteration 61100 / 100000 total volume: 140189
+Iteration 61200 / 100000 total volume: 140189
+Iteration 61300 / 100000 total volume: 140189
+Iteration 61400 / 100000 total volume: 140189
+Iteration 61500 / 100000 total volume: 140189
+Iteration 61600 / 100000 total volume: 140189
+Iteration 61700 / 100000 total volume: 140189
+Iteration 61800 / 100000 total volume: 140189
+Iteration 61900 / 100000 total volume: 140189
+Iteration 62000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 62000
+Iteration 62100 / 100000 total volume: 140189
+Iteration 62200 / 100000 total volume: 140189
+Iteration 62300 / 100000 total volume: 140189
+Iteration 62400 / 100000 total volume: 140189
+Iteration 62500 / 100000 total volume: 140189
+Iteration 62600 / 100000 total volume: 140189
+Iteration 62700 / 100000 total volume: 140189
+Iteration 62800 / 100000 total volume: 140189
+Iteration 62900 / 100000 total volume: 140189
+Iteration 63000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 63000
+Iteration 63100 / 100000 total volume: 140189
+Iteration 63200 / 100000 total volume: 140189
+Iteration 63300 / 100000 total volume: 140189
+Iteration 63400 / 100000 total volume: 140189
+Iteration 63500 / 100000 total volume: 140189
+Iteration 63600 / 100000 total volume: 140189
+Iteration 63700 / 100000 total volume: 140189
+Iteration 63800 / 100000 total volume: 140189
+Iteration 63900 / 100000 total volume: 140189
+Iteration 64000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 64000
+Iteration 64100 / 100000 total volume: 140189
+Iteration 64200 / 100000 total volume: 140189
+Iteration 64300 / 100000 total volume: 140189
+Iteration 64400 / 100000 total volume: 140189
+Iteration 64500 / 100000 total volume: 140189
+Iteration 64600 / 100000 total volume: 140189
+Iteration 64700 / 100000 total volume: 140189
+Iteration 64800 / 100000 total volume: 140189
+Iteration 64900 / 100000 total volume: 140189
+Iteration 65000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 65000
+Iteration 65100 / 100000 total volume: 140189
+Iteration 65200 / 100000 total volume: 140189
+Iteration 65300 / 100000 total volume: 140189
+Iteration 65400 / 100000 total volume: 140189
+Iteration 65500 / 100000 total volume: 140189
+Iteration 65600 / 100000 total volume: 140189
+Iteration 65700 / 100000 total volume: 140189
+Iteration 65800 / 100000 total volume: 140189
+Iteration 65900 / 100000 total volume: 140189
+Iteration 66000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 66000
+Iteration 66100 / 100000 total volume: 140189
+Iteration 66200 / 100000 total volume: 140189
+Iteration 66300 / 100000 total volume: 140189
+Iteration 66400 / 100000 total volume: 140189
+Iteration 66500 / 100000 total volume: 140189
+Iteration 66600 / 100000 total volume: 140189
+Iteration 66700 / 100000 total volume: 140189
+Iteration 66800 / 100000 total volume: 140189
+Iteration 66900 / 100000 total volume: 140189
+Iteration 67000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 67000
+Iteration 67100 / 100000 total volume: 140189
+Iteration 67200 / 100000 total volume: 140189
+Iteration 67300 / 100000 total volume: 140189
+Iteration 67400 / 100000 total volume: 140189
+Iteration 67500 / 100000 total volume: 140189
+Iteration 67600 / 100000 total volume: 140189
+Iteration 67700 / 100000 total volume: 140189
+Iteration 67800 / 100000 total volume: 140189
+Iteration 67900 / 100000 total volume: 140189
+Iteration 68000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 68000
+Iteration 68100 / 100000 total volume: 140189
+Iteration 68200 / 100000 total volume: 140189
+Iteration 68300 / 100000 total volume: 140189
+Iteration 68400 / 100000 total volume: 140189
+Iteration 68500 / 100000 total volume: 140189
+Iteration 68600 / 100000 total volume: 140189
+Iteration 68700 / 100000 total volume: 140189
+Iteration 68800 / 100000 total volume: 140189
+Iteration 68900 / 100000 total volume: 140189
+Iteration 69000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 69000
+Iteration 69100 / 100000 total volume: 140189
+Iteration 69200 / 100000 total volume: 140189
+Iteration 69300 / 100000 total volume: 140189
+Iteration 69400 / 100000 total volume: 140189
+Iteration 69500 / 100000 total volume: 140189
+Iteration 69600 / 100000 total volume: 140189
+Iteration 69700 / 100000 total volume: 140189
+Iteration 69800 / 100000 total volume: 140189
+Iteration 69900 / 100000 total volume: 140189
+Iteration 70000 / 100000 total volume: 140189
+Writing checkpoint
+Writing flow field and particle data at iteration 70000
+Iteration 70100 / 100000 total volume: 140189
+Iteration 70200 / 100000 total volume: 140189
+Iteration 70300 / 100000 total volume: 140189
+Iteration 70400 / 100000 total volume: 140189
+Iteration 70500 / 100000 total volume: 140189
+Iteration 70600 / 100000 total volume: 140189
+Iteration 70700 / 100000 total volume: 140189
+Iteration 70800 / 100000 total volume: 140189
+Iteration 70900 / 100000 total volume: 140189
+Iteration 71000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 71000
+Iteration 71100 / 100000 total volume: 140189
+Iteration 71200 / 100000 total volume: 140189
+Iteration 71300 / 100000 total volume: 140189
+Iteration 71400 / 100000 total volume: 140189
+Iteration 71500 / 100000 total volume: 140189
+Iteration 71600 / 100000 total volume: 140189
+Iteration 71700 / 100000 total volume: 140189
+Iteration 71800 / 100000 total volume: 140189
+Iteration 71900 / 100000 total volume: 140189
+Iteration 72000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 72000
+Iteration 72100 / 100000 total volume: 140189
+Iteration 72200 / 100000 total volume: 140189
+Iteration 72300 / 100000 total volume: 140189
+Iteration 72400 / 100000 total volume: 140189
+Iteration 72500 / 100000 total volume: 140189
+Iteration 72600 / 100000 total volume: 140189
+Iteration 72700 / 100000 total volume: 140189
+Iteration 72800 / 100000 total volume: 140189
+Iteration 72900 / 100000 total volume: 140189
+Iteration 73000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 73000
+Iteration 73100 / 100000 total volume: 140189
+Iteration 73200 / 100000 total volume: 140189
+Iteration 73300 / 100000 total volume: 140189
+Iteration 73400 / 100000 total volume: 140189
+Iteration 73500 / 100000 total volume: 140189
+Iteration 73600 / 100000 total volume: 140189
+Iteration 73700 / 100000 total volume: 140189
+Iteration 73800 / 100000 total volume: 140189
+Iteration 73900 / 100000 total volume: 140189
+Iteration 74000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 74000
+Iteration 74100 / 100000 total volume: 140189
+Iteration 74200 / 100000 total volume: 140189
+Iteration 74300 / 100000 total volume: 140189
+Iteration 74400 / 100000 total volume: 140189
+Iteration 74500 / 100000 total volume: 140189
+Iteration 74600 / 100000 total volume: 140189
+Iteration 74700 / 100000 total volume: 140189
+Iteration 74800 / 100000 total volume: 140189
+Iteration 74900 / 100000 total volume: 140189
+Iteration 75000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 75000
+Iteration 75100 / 100000 total volume: 140189
+Iteration 75200 / 100000 total volume: 140189
+Iteration 75300 / 100000 total volume: 140189
+Iteration 75400 / 100000 total volume: 140189
+Iteration 75500 / 100000 total volume: 140189
+Iteration 75600 / 100000 total volume: 140189
+Iteration 75700 / 100000 total volume: 140189
+Iteration 75800 / 100000 total volume: 140189
+Iteration 75900 / 100000 total volume: 140189
+Iteration 76000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 76000
+Iteration 76100 / 100000 total volume: 140189
+Iteration 76200 / 100000 total volume: 140189
+Iteration 76300 / 100000 total volume: 140189
+Iteration 76400 / 100000 total volume: 140189
+Iteration 76500 / 100000 total volume: 140189
+Iteration 76600 / 100000 total volume: 140189
+Iteration 76700 / 100000 total volume: 140189
+Iteration 76800 / 100000 total volume: 140189
+Iteration 76900 / 100000 total volume: 140189
+Iteration 77000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 77000
+Iteration 77100 / 100000 total volume: 140189
+Iteration 77200 / 100000 total volume: 140189
+Iteration 77300 / 100000 total volume: 140189
+Iteration 77400 / 100000 total volume: 140189
+Iteration 77500 / 100000 total volume: 140189
+Iteration 77600 / 100000 total volume: 140189
+Iteration 77700 / 100000 total volume: 140189
+Iteration 77800 / 100000 total volume: 140189
+Iteration 77900 / 100000 total volume: 140189
+Iteration 78000 / 100000 total volume: 140189
+Writing flow field and particle data at iteration 78000
+Iteration 78100 / 100000 total volume: 140189
+Iteration 78200 / 100000 total volume: 140189
+Iteration 78300 / 100000 total volume: 140189
+Iteration 78400 / 100000 total volume: 140189
+Iteration 78500 / 100000 total volume: 140189
+Iteration 78600 / 100000 total volume: 140189
+Iteration 78700 / 100000 total volume: 140189
+Iteration 78800 / 100000 total volume: 140189
+Iteration 78900 / 100000 total volume: 140190
+Iteration 79000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 79000
+Iteration 79100 / 100000 total volume: 140190
+Iteration 79200 / 100000 total volume: 140190
+Iteration 79300 / 100000 total volume: 140190
+Iteration 79400 / 100000 total volume: 140190
+Iteration 79500 / 100000 total volume: 140190
+Iteration 79600 / 100000 total volume: 140190
+Iteration 79700 / 100000 total volume: 140190
+Iteration 79800 / 100000 total volume: 140190
+Iteration 79900 / 100000 total volume: 140190
+Iteration 80000 / 100000 total volume: 140190
+Writing checkpoint
+Writing flow field and particle data at iteration 80000
+Iteration 80100 / 100000 total volume: 140190
+Iteration 80200 / 100000 total volume: 140190
+Iteration 80300 / 100000 total volume: 140190
+Iteration 80400 / 100000 total volume: 140190
+Iteration 80500 / 100000 total volume: 140190
+Iteration 80600 / 100000 total volume: 140190
+Iteration 80700 / 100000 total volume: 140190
+Iteration 80800 / 100000 total volume: 140190
+Iteration 80900 / 100000 total volume: 140190
+Iteration 81000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 81000
+Iteration 81100 / 100000 total volume: 140190
+Iteration 81200 / 100000 total volume: 140190
+Iteration 81300 / 100000 total volume: 140190
+Iteration 81400 / 100000 total volume: 140190
+Iteration 81500 / 100000 total volume: 140190
+Iteration 81600 / 100000 total volume: 140190
+Iteration 81700 / 100000 total volume: 140190
+Iteration 81800 / 100000 total volume: 140190
+Iteration 81900 / 100000 total volume: 140190
+Iteration 82000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 82000
+Iteration 82100 / 100000 total volume: 140190
+Iteration 82200 / 100000 total volume: 140190
+Iteration 82300 / 100000 total volume: 140190
+Iteration 82400 / 100000 total volume: 140190
+Iteration 82500 / 100000 total volume: 140190
+Iteration 82600 / 100000 total volume: 140190
+Iteration 82700 / 100000 total volume: 140190
+Iteration 82800 / 100000 total volume: 140190
+Iteration 82900 / 100000 total volume: 140190
+Iteration 83000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 83000
+Iteration 83100 / 100000 total volume: 140190
+Iteration 83200 / 100000 total volume: 140190
+Iteration 83300 / 100000 total volume: 140190
+Iteration 83400 / 100000 total volume: 140190
+Iteration 83500 / 100000 total volume: 140190
+Iteration 83600 / 100000 total volume: 140190
+Iteration 83700 / 100000 total volume: 140190
+Iteration 83800 / 100000 total volume: 140190
+Iteration 83900 / 100000 total volume: 140190
+Iteration 84000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 84000
+Iteration 84100 / 100000 total volume: 140190
+Iteration 84200 / 100000 total volume: 140190
+Iteration 84300 / 100000 total volume: 140190
+Iteration 84400 / 100000 total volume: 140190
+Iteration 84500 / 100000 total volume: 140190
+Iteration 84600 / 100000 total volume: 140190
+Iteration 84700 / 100000 total volume: 140190
+Iteration 84800 / 100000 total volume: 140190
+Iteration 84900 / 100000 total volume: 140190
+Iteration 85000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 85000
+Iteration 85100 / 100000 total volume: 140190
+Iteration 85200 / 100000 total volume: 140190
+Iteration 85300 / 100000 total volume: 140190
+Iteration 85400 / 100000 total volume: 140190
+Iteration 85500 / 100000 total volume: 140190
+Iteration 85600 / 100000 total volume: 140190
+Iteration 85700 / 100000 total volume: 140190
+Iteration 85800 / 100000 total volume: 140190
+Iteration 85900 / 100000 total volume: 140190
+Iteration 86000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 86000
+Iteration 86100 / 100000 total volume: 140190
+Iteration 86200 / 100000 total volume: 140190
+Iteration 86300 / 100000 total volume: 140190
+Iteration 86400 / 100000 total volume: 140190
+Iteration 86500 / 100000 total volume: 140190
+Iteration 86600 / 100000 total volume: 140190
+Iteration 86700 / 100000 total volume: 140190
+Iteration 86800 / 100000 total volume: 140190
+Iteration 86900 / 100000 total volume: 140190
+Iteration 87000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 87000
+Iteration 87100 / 100000 total volume: 140190
+Iteration 87200 / 100000 total volume: 140190
+Iteration 87300 / 100000 total volume: 140190
+Iteration 87400 / 100000 total volume: 140190
+Iteration 87500 / 100000 total volume: 140190
+Iteration 87600 / 100000 total volume: 140190
+Iteration 87700 / 100000 total volume: 140190
+Iteration 87800 / 100000 total volume: 140190
+Iteration 87900 / 100000 total volume: 140190
+Iteration 88000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 88000
+Iteration 88100 / 100000 total volume: 140190
+Iteration 88200 / 100000 total volume: 140190
+Iteration 88300 / 100000 total volume: 140190
+Iteration 88400 / 100000 total volume: 140190
+Iteration 88500 / 100000 total volume: 140190
+Iteration 88600 / 100000 total volume: 140190
+Iteration 88700 / 100000 total volume: 140190
+Iteration 88800 / 100000 total volume: 140190
+Iteration 88900 / 100000 total volume: 140190
+Iteration 89000 / 100000 total volume: 140190
+Writing flow field and particle data at iteration 89000
+Iteration 89100 / 100000 total volume: 140190
+Iteration 89200 / 100000 total volume: 140190
+Iteration 89300 / 100000 total volume: 140191
+Iteration 89400 / 100000 total volume: 140191
+Iteration 89500 / 100000 total volume: 140191
+Iteration 89600 / 100000 total volume: 140191
+Iteration 89700 / 100000 total volume: 140191
+Iteration 89800 / 100000 total volume: 140191
+Iteration 89900 / 100000 total volume: 140191
+Iteration 90000 / 100000 total volume: 140191
+Writing checkpoint
+Writing flow field and particle data at iteration 90000
+Iteration 90100 / 100000 total volume: 140191
+Iteration 90200 / 100000 total volume: 140191
+Iteration 90300 / 100000 total volume: 140191
+Iteration 90400 / 100000 total volume: 140191
+Iteration 90500 / 100000 total volume: 140191
+Iteration 90600 / 100000 total volume: 140191
+Iteration 90700 / 100000 total volume: 140191
+Iteration 90800 / 100000 total volume: 140191
+Iteration 90900 / 100000 total volume: 140191
+Iteration 91000 / 100000 total volume: 140191
+Writing flow field and particle data at iteration 91000
+Iteration 91100 / 100000 total volume: 140191
+Iteration 91200 / 100000 total volume: 140191
+Iteration 91300 / 100000 total volume: 140191
+Iteration 91400 / 100000 total volume: 140191
+Iteration 91500 / 100000 total volume: 140191
+Iteration 91600 / 100000 total volume: 140191
+Iteration 91700 / 100000 total volume: 140191
+Iteration 91800 / 100000 total volume: 140191
+Iteration 91900 / 100000 total volume: 140191
+Iteration 92000 / 100000 total volume: 140191
+Writing flow field and particle data at iteration 92000
+Iteration 92100 / 100000 total volume: 140191
+Iteration 92200 / 100000 total volume: 140191
+Iteration 92300 / 100000 total volume: 140191
+Iteration 92400 / 100000 total volume: 140191
+Iteration 92500 / 100000 total volume: 140191
+Iteration 92600 / 100000 total volume: 140191
+Iteration 92700 / 100000 total volume: 140191
+Iteration 92800 / 100000 total volume: 140191
+Iteration 92900 / 100000 total volume: 140191
+Iteration 93000 / 100000 total volume: 140191
+Writing flow field and particle data at iteration 93000
+Iteration 93100 / 100000 total volume: 140191
+Iteration 93200 / 100000 total volume: 140191
+Iteration 93300 / 100000 total volume: 140191
+Iteration 93400 / 100000 total volume: 140191
+Iteration 93500 / 100000 total volume: 140191
+Iteration 93600 / 100000 total volume: 140191
+Iteration 93700 / 100000 total volume: 140191
+Iteration 93800 / 100000 total volume: 140191
+Iteration 93900 / 100000 total volume: 140191
+Iteration 94000 / 100000 total volume: 140191
+Writing flow field and particle data at iteration 94000
+Iteration 94100 / 100000 total volume: 140191
+Iteration 94200 / 100000 total volume: 140191
+Iteration 94300 / 100000 total volume: 140191
+Iteration 94400 / 100000 total volume: 140191
+Iteration 94500 / 100000 total volume: 140191
+Iteration 94600 / 100000 total volume: 140191
+Iteration 94700 / 100000 total volume: 140191
+Iteration 94800 / 100000 total volume: 140191
+Iteration 94900 / 100000 total volume: 140191
+Iteration 95000 / 100000 total volume: 140191
+Writing flow field and particle data at iteration 95000
+Iteration 95100 / 100000 total volume: 140191
+Iteration 95200 / 100000 total volume: 140191
+Iteration 95300 / 100000 total volume: 140191
+Iteration 95400 / 100000 total volume: 140191
+Iteration 95500 / 100000 total volume: 140191
+Iteration 95600 / 100000 total volume: 140191
+Iteration 95700 / 100000 total volume: 140191
+Iteration 95800 / 100000 total volume: 140191
+Iteration 95900 / 100000 total volume: 140191
+Iteration 96000 / 100000 total volume: 140191
+Writing flow field and particle data at iteration 96000
+Iteration 96100 / 100000 total volume: 140191
+Iteration 96200 / 100000 total volume: 140191
+Iteration 96300 / 100000 total volume: 140191
+Iteration 96400 / 100000 total volume: 140191
+Iteration 96500 / 100000 total volume: 140191
+Iteration 96600 / 100000 total volume: 140191
+Iteration 96700 / 100000 total volume: 140191
+Iteration 96800 / 100000 total volume: 140191
+Iteration 96900 / 100000 total volume: 140191
+Iteration 97000 / 100000 total volume: 140191
+Writing flow field and particle data at iteration 97000
+Iteration 97100 / 100000 total volume: 140191
+Iteration 97200 / 100000 total volume: 140191
+Iteration 97300 / 100000 total volume: 140191
+Iteration 97400 / 100000 total volume: 140191
+Iteration 97500 / 100000 total volume: 140192
+Iteration 97600 / 100000 total volume: 140192
+Iteration 97700 / 100000 total volume: 140192
+Iteration 97800 / 100000 total volume: 140192
+Iteration 97900 / 100000 total volume: 140192
+Iteration 98000 / 100000 total volume: 140192
+Writing flow field and particle data at iteration 98000
+Iteration 98100 / 100000 total volume: 140192
+Iteration 98200 / 100000 total volume: 140192
+Iteration 98300 / 100000 total volume: 140192
+Iteration 98400 / 100000 total volume: 140192
+Iteration 98500 / 100000 total volume: 140192
+Iteration 98600 / 100000 total volume: 140192
+Iteration 98700 / 100000 total volume: 140192
+Iteration 98800 / 100000 total volume: 140192
+Iteration 98900 / 100000 total volume: 140192
+Iteration 99000 / 100000 total volume: 140192
+Writing flow field and particle data at iteration 99000
+Iteration 99100 / 100000 total volume: 140192
+Iteration 99200 / 100000 total volume: 140192
+Iteration 99300 / 100000 total volume: 140192
+Iteration 99400 / 100000 total volume: 140192
+Iteration 99500 / 100000 total volume: 140192
+Iteration 99600 / 100000 total volume: 140192
+Iteration 99700 / 100000 total volume: 140192
+Iteration 99800 / 100000 total volume: 140192
+Iteration 99900 / 100000 total volume: 140192
+Iteration 100000 / 100000 total volume: 140192
+Writing checkpoint
+Writing flow field and particle data at iteration 100000

@@ -1,0 +1,82 @@
+clc; close all; clear
+
+% Parameters
+G = 6e-6;
+poisson_ratio = 0.995;
+bend_energy = 4e-18;
+mesh_file = '?';
+
+% RBC properties
+vol_si = 79.6500e-18;
+area_si = 135e-12;
+
+dxs = [1, 0.5, 0.3, 0.25]*1e-6;
+
+for i = 1:length(dxs)
+    dx = dxs(i);
+    folder = sprintf('tweezers_G%g_Kb%g_dx%g', G, bend_energy, dx);
+    
+    if ~exist(folder, 'dir')
+        mkdir(folder)
+    end
+    
+    % RBC area in lattice units
+    area = area_si / dx^2;
+    
+    % Equivalent sphere radius
+    r = sqrt(area / (4*pi));
+    
+    mesh_file = sprintf('%s/sphere_r%f', folder, r);
+    
+    if ~exist(mesh_file, 'file')
+        % Find number of points to use
+        h_desired = 1;  % Desired edge length
+        A_tri_desired = sqrt(3)/2 * h_desired^2
+        N_points = 2*round(area / A_tri_desired / 2)+2
+        
+        % Generate mesh (on the unit sphere)
+        [V, Tri] = ParticleSampleSphere('N', N_points, 'Etol', 1e-6);
+        V = r*V;    % Scale so that the sphere has the correct radius
+        tr = TriRep(Tri, V(:, 1), V(:, 2), V(:, 3));
+
+        % Mesh statistics
+        edges = [V(Tri(:, 2), :) - V(Tri(:, 1), :)
+                 V(Tri(:, 3), :) - V(Tri(:, 2), :)
+                 V(Tri(:, 1), :) - V(Tri(:, 3), :)];
+        ar = sqrt(sum((edges(.^2, 2))/2
+        mean_dist = mean(sqrt(sum(edges.^2, 2)))
+        std_dist = std(sqrt(sum(edges.^2, 2)))
+        
+        % Write to mesh file
+        write_gmsh(mesh_file, tr, V)
+    end
+
+    % Write parameter file
+    fid = fopen(sprintf('%s/params.xml', folder), 'w');
+    fprintf(fid, '<?xml version="1.0" ?>\n');
+    fprintf(fid, '<forcing>\n');
+    fprintf(fid, '	<Nrelax>40000</Nrelax>\n');
+    fprintf(fid, '	<force_steps>40</force_steps>\n');
+    fprintf(fid, '	<min_force>0</min_force>\n');
+    fprintf(fid, '	<max_force>200e-12</max_force>\n');
+    fprintf(fid, '	<node_fraction>0.02</node_fraction>\n');
+    fprintf(fid, '</forcing>\n');
+    fprintf(fid, '<units>\n');
+    fprintf(fid, '	<tau>4</tau>\n');
+    fprintf(fid, '	<dx>%g</dx>\n', dx);
+    fprintf(fid, '	<nu_plasma>1.46e-6</nu_plasma>\n');
+    fprintf(fid, '	<rho_plasma>1025</rho_plasma>\n');
+    fprintf(fid, '</units>\n');
+    fprintf(fid, '<rbc>\n');
+    fprintf(fid, '	<shear_modulus>%g</shear_modulus>\n', G);
+    fprintf(fid, '	<bending_energy>%g</bending_energy>\n', bend_energy);
+    fprintf(fid, '	<poisson_ratio>%g</poisson_ratio>\n', poisson_ratio);
+    fprintf(fid, '	<lambda>1</lambda>\n');
+    fprintf(fid, '	<mesh>%s</mesh>\n', mesh_file);
+    fprintf(fid, '	<deflation_factor>0.59</deflation_factor>\n');
+    fprintf(fid, '</rbc>\n');
+    fprintf(fid, '<output>\n');
+    fprintf(fid, '	<folder>%s</folder>\n', folder);
+    fprintf(fid, '</output>\n');
+    fclose(fid);
+end

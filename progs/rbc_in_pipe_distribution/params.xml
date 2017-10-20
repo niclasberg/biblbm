@@ -1,0 +1,149 @@
+<?xml version="1.0" ?>
+<geometry>
+	<!-- Diameter (lattice units) -->
+	<diameter>84</diameter>
+	<!-- Pipe length -->
+	<length>84</length>
+</geometry>
+<physics>
+	<!-- Channel Reynolds number rho*uMax*d/mu-->
+	<Re_d>1</Re_d>
+	<lambda>1</lambda>
+</physics>
+<particles>
+	<wall_interaction>
+		<!-- available types: none/morse/spring -->
+		<type>morse</type>
+		<r_min>2</r_min>
+		<beta>2</beta>
+		<strength>1e-4</strength>
+	</wall_interaction>
+	<particle_interaction>
+		<!-- available types: none/morse/spring -->
+		<type>morse</type>
+		<r_min>1</r_min>
+		<beta>1</beta>
+		<strength>1e-3</strength>
+	</particle_interaction>
+	<platelet>
+		<mesh>sphere_2_2_2_TRImesh_54n_104el.msh</mesh>
+		<type>semirigid</type>
+		<Ca>0.01</Ca>
+		<concentration>0.005</concentration>
+	</platelet>
+	<rbc1>
+	 <mesh>rbc_rdw12/sphere_n1.msh</mesh>
+	 <type>rbc</type>
+	 <concentration>0.002525</concentration>
+	 <mesh_deflation>0.771800</mesh_deflation>
+	 <poisson_ratio>0.995</poisson_ratio>
+	 <Xi_b>0.006</Xi_b>
+	 <Ca>0.1</Ca>
+	</rbc1>
+	<rbc2>
+	 <mesh>rbc_rdw12/sphere_n2.msh</mesh>
+	 <type>rbc</type>
+	 <concentration>0.006387</concentration>
+	 <mesh_deflation>0.740708</mesh_deflation>
+	 <poisson_ratio>0.995</poisson_ratio>
+	 <Xi_b>0.006</Xi_b>
+	 <Ca>0.1</Ca>
+	</rbc2>
+	<rbc3>
+	 <mesh>rbc_rdw12/sphere_n3.msh</mesh>
+	 <type>rbc</type>
+	 <concentration>0.016208</concentration>
+	 <mesh_deflation>0.713094</mesh_deflation>
+	 <poisson_ratio>0.995</poisson_ratio>
+	 <Xi_b>0.006</Xi_b>
+	 <Ca>0.1</Ca>
+	</rbc3>
+	<rbc4>
+	 <mesh>rbc_rdw12/sphere_n4.msh</mesh>
+	 <type>rbc</type>
+	 <concentration>0.032028</concentration>
+	 <mesh_deflation>0.688355</mesh_deflation>
+	 <poisson_ratio>0.995</poisson_ratio>
+	 <Xi_b>0.006</Xi_b>
+	 <Ca>0.1</Ca>
+	</rbc4>
+	<rbc5>
+	 <mesh>rbc_rdw12/sphere_n5.msh</mesh>
+	 <type>rbc</type>
+	 <concentration>0.049321</concentration>
+	 <mesh_deflation>0.666024</mesh_deflation>
+	 <poisson_ratio>0.995</poisson_ratio>
+	 <Xi_b>0.006</Xi_b>
+	 <Ca>0.1</Ca>
+	</rbc5>
+	<rbc6>
+	 <mesh>rbc_rdw12/sphere_n6.msh</mesh>
+	 <type>rbc</type>
+	 <concentration>0.059224</concentration>
+	 <mesh_deflation>0.645734</mesh_deflation>
+	 <poisson_ratio>0.995</poisson_ratio>
+	 <Xi_b>0.006</Xi_b>
+	 <Ca>0.1</Ca>
+	</rbc6>
+	<rbc7>
+	 <mesh>rbc_rdw12/sphere_n7.msh</mesh>
+	 <type>rbc</type>
+	 <concentration>0.055479</concentration>
+	 <mesh_deflation>0.627192</mesh_deflation>
+	 <poisson_ratio>0.995</poisson_ratio>
+	 <Xi_b>0.006</Xi_b>
+	 <Ca>0.1</Ca>
+	</rbc7>
+	<rbc8>
+	 <mesh>rbc_rdw12/sphere_n8.msh</mesh>
+	 <type>rbc</type>
+	 <concentration>0.040559</concentration>
+	 <mesh_deflation>0.610161</mesh_deflation>
+	 <poisson_ratio>0.995</poisson_ratio>
+	 <Xi_b>0.006</Xi_b>
+	 <Ca>0.1</Ca>
+	</rbc8>
+	<rbc9>
+	 <mesh>rbc_rdw12/sphere_n9.msh</mesh>
+	 <type>rbc</type>
+	 <concentration>0.023147</concentration>
+	 <mesh_deflation>0.594446</mesh_deflation>
+	 <poisson_ratio>0.995</poisson_ratio>
+	 <Xi_b>0.006</Xi_b>
+	 <Ca>0.1</Ca>
+	</rbc9>
+	<rbc10>
+	 <mesh>rbc_rdw12/sphere_n10.msh</mesh>
+	 <type>rbc</type>
+	 <concentration>0.010314</concentration>
+	 <mesh_deflation>0.579886</mesh_deflation>
+	 <poisson_ratio>0.995</poisson_ratio>
+	 <Xi_b>0.006</Xi_b>
+	 <Ca>0.1</Ca>
+	</rbc10>
+	<rbc11>
+	 <mesh>rbc_rdw12/sphere_n11.msh</mesh>
+	 <type>rbc</type>
+	 <concentration>0.004810</concentration>
+	 <mesh_deflation>0.566346</mesh_deflation>
+	 <poisson_ratio>0.995</poisson_ratio>
+	 <Xi_b>0.006</Xi_b>
+	 <Ca>0.1</Ca>
+	</rbc11>
+</particles>
+<numerics>
+	<max_iterations>500000</max_iterations>
+	<tau>0.55</tau>
+</numerics>
+<checkpoints>
+	<folder>rbc_rdw12</folder>
+	<start_from_checkpoint>false</start_from_checkpoint>
+	<write_interval>50000</write_interval>
+</checkpoints>
+<output>
+	<folder>rbc_rdw12</folder>
+	<!--<folder>single_rbc</folder>-->
+	<flow_vtk_interval>1000</flow_vtk_interval>
+	<particle_vtk_interval>1000</particle_vtk_interval>
+	<particle_lw_interval>1000</particle_lw_interval>
+</output>

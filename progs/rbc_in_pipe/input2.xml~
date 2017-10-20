@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<geometry>
+	<!-- Diameter (lattice units) -->
+	<diameter>84</diameter>
+	<!-- Pipe length -->
+	<length>84</length>
+</geometry>
+<physics>
+	<!-- Channel Reynolds number rho*uMax*d/mu-->
+	<Re_d>1</Re_d>
+</physics>
+<particles>
+	<rbc>
+		<mesh>sphere_TRImesh_626n_1248el.msh</mesh>
+		<concentration>0.3</concentration>
+		
+		<!-- The initial sphere mesh is deflated to achieve 
+		a fraction of its volume to obtain the biconcave shape -->
+		<!--<deflate_ratio>0.59</deflate_ratio>-->
+		
+		<!-- Poisson ratio-->
+		<poisson_ratio>0.990</poisson_ratio>
+		
+		<!-- Relative bending stiffness -->
+		<Xi_b>0.006</Xi_b>
+		
+		<!-- Viscosity contrast (RBC inner to outer)-->
+		<lambda>5</lambda>
+		
+		<!-- Capillary number gamma*a_rbc*mu / G-->
+		<Ca>0.5</Ca>
+	</rbc>
+	<platelet>
+		<mesh>sphere_2_2_2_TRImesh_54n_104el.msh</mesh>
+		<concentration>0.005</concentration>
+		<initialize>false</initialize>
+	</platelet>
+</particles>
+<numerics>
+	<max_iterations>500000</max_iterations>
+	<tau>1</tau>
+</numerics>
+<checkpoints>
+	<folder>results2</folder>
+	<start_from_checkpoint>true</start_from_checkpoint>
+	<write_interval>10000</write_interval>
+</checkpoints>
+<output>
+	<write_interval>1000</write_interval>
+	<folder>results2</folder>
+</output>
