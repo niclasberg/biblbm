@@ -38,3 +38,6 @@ lib/
 *.m
 *.vtu
 *.vti
+
+# Ignore scons cache files
+.sconsign.dblite
