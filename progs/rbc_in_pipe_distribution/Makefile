@@ -60,6 +60,13 @@ debugFlags   = -g
 # Compiler flags to use when profile mode is on
 profileFlags = -pg
 
+# Special flags for different clusters
+HOST = $(shell hostname)
+ifneq(, $(findstring hpc2n.umu.se, ${HOST}))
+	parallelCXX = mpiCC
+	serialCXX = mpiCC
+endif
+
 
 ##########################################################################
 # All code below this line is just about forwarding the options

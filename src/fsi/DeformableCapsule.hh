@@ -18,8 +18,6 @@ namespace plb {
 namespace fsi {
 
 /**** CapsuleParams ****/
-
-
 template<class T>
 	template<class BufferType>
 void CapsuleParameters<T>::pack(BufferType & buff) const
@@ -40,7 +38,7 @@ void CapsuleParameters<T>::unpack(BufferType & buff)
 	utils::unpack(buff, this->G);
 }
 
-/**** RBCParticle ****/
+/**** DeformableCapsuleParticle ****/
 template<class T>
 plint DeformableCapsuleParticle<T>::type_id = register_particle_type<T, DeformableCapsuleParticle<T> >();
 
@@ -213,26 +211,6 @@ void DeformableCapsuleParticle<T>::compute_forces()
 					(1-params().nu_s)*(K22 * grad_K11[i] - 2.*K12*grad_K12[i] + K11*grad_K22[i]));
 		}
 	}*/
-}
-
-template<class T>
-void DeformableCapsuleParticle<T>::compute_wall_interaction_forces(const Boundary<T> & boundary)
-{
-	/*const MorsePotential<T> potential(2, 2, 1e-3);
-
-	//bool ret = false;
-	for(plint i = 0; i < this->count_nodes(); ++i) {
-		Vertex<T> & node = this->get_node(i);
-
-		T dist = boundary.distance_to_boundary(node.pos);
-
-		if(dist <= potential.get_repulsion_distance()) {
-			node.force += -potential(dist) * boundary.get_normal(node.pos);
-			//ret = true;
-		}
-	}*/
-
-	//return ret;
 }
 
 /******** Serialization *********/

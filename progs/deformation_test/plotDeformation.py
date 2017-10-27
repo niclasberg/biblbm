@@ -2,7 +2,9 @@ import numpy as np
 import glob
 import matplotlib.pyplot as plt
 
-folders = ['tweezers_G6e-06_Kb4e-18_dx1e-06', 'tweezers_G6e-06_Kb4e-18_dx5e-07', 'tweezers_G6e-06_Kb4e-18_dx3e-07', 'tweezers_G6e-06_Kb4e-18_dx2.5e-07']
+folders = ['tweezers_G6e-06_Kb4e-18_dx1e-06', 'tweezers_G6e-06_Kb4e-18_dx5e-07', 'tweezers_G6e-06_Kb4e-18_dx2.5e-07']
+legends = ['$\Delta x = 1\ \mu m$', '$\Delta x = 0.5\ \mu m$', '$\Delta x = 0.25\ \mu m$']
+styles = ['r:', 'g.-', 'k--']
 
 # Read experimental data
 expData = np.genfromtxt('mills_optical_tweezer_final.txt', delimiter=',')
@@ -12,12 +14,12 @@ expDxErr = expData[:, 4] - expData[:, 3]
 expDyz = expData[:, 1]
 expDyzErr = expData[:, 1] - expData[:, 2]
 
-cmpPlot = plt.figure()
-plt.errorbar(expForce, expDx, yerr=expDxErr, fmt='sb')
-plt.errorbar(expForce, expDyz, yerr=expDyzErr,fmt='sr')
+cmpPlot, ax = plt.subplots(figsize=(6,6))
+plt.errorbar(expForce, expDx, yerr=expDxErr, fmt='sb', label='Experiments')
+plt.errorbar(expForce, expDyz, yerr=expDyzErr,fmt='sb')
 
 # Read simulation data
-for folder in folders:
+for folder, legend, linestyle in zip(folders, legends, styles):
 	files = glob.glob(folder +'/deformation*.txt')
 
 	data = None
@@ -55,10 +57,16 @@ for folder in folders:
 	simForce[0] = 0.
 	
 	plt.figure(cmpPlot.number)
-	plt.plot(simForce, simDx, '.-', label='Dx')
-	plt.plot(simForce, simDyz, '.-', label='Dyz')
-plt.ylim([0, 18])
+	plt.plot(simForce, simDx, linestyle, label=legend)
+	plt.plot(simForce, simDyz, linestyle)
+plt.legend(loc='upper left')
+#xmin,xmax = ax.get_xlim()
+#ymin,ymax = ax.get_ylim()
+#asp = abs((xmax-xmin)/(ymax-ymin))
+#ax.set_aspect(asp)
+
+plt.ylim([0, 20])
 plt.xlim([0, 200])
-plt.xlabel('Force [pN]')
-plt.ylabel('Deformation [$\mu$m]')
-plt.savefig('deformationComparison.png', bbox_inches='tight')
+plt.xlabel('Force [pN]', fontsize=16)
+plt.ylabel('Axis length [$\mu$m]', fontsize=16)
+plt.savefig('deformationComparison.pdf', bbox_inches='tight')

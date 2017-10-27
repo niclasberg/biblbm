@@ -47,7 +47,6 @@ public:
 	virtual plint get_type_id() const { return type_id; }
 
 	virtual void compute_forces();
-	virtual void compute_wall_interaction_forces(const Boundary<T> &);
 	void relax_nodes(T);
 	void print_energies(T, std::ostream &) const;
 

@@ -30,9 +30,9 @@ template<class T> class Boundary;
 // Node information object
 template<class T>
 struct Vertex {
-	Array<T, 3> pos;
-	Array<T, 3> vel;
-	Array<T, 3> force;
+	Array<T, 3> pos;	// Node position (world frame)
+	Array<T, 3> vel;	// Fluid velocity
+	Array<T, 3> force;	// Node force
 };
 
 template<class T>
