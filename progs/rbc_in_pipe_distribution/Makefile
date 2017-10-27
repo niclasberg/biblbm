@@ -62,7 +62,7 @@ profileFlags = -pg
 
 # Special flags for different clusters
 HOST = $(shell hostname)
-ifneq(, $(findstring hpc2n.umu.se, ${HOST}))
+ifneq (, $(findstring hpc2n.umu.se,$(HOST)))
 	parallelCXX = mpiCC
 	serialCXX = mpiCC
 endif
