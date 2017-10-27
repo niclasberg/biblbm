@@ -40,4 +40,4 @@ lib/
 *.vti
 
 # Ignore scons cache files
-.sconsign.dblite
+*.sconsign.dblite
