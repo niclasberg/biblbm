@@ -178,12 +178,80 @@ void interpolate(
 	interpolate_impl<T, Arithmetic, NodeType, Dirac, GeneralInterpolator<T, Dirac> >(dom, velocity, node_container, arithmetic, sampled_dirac);
 }
 
+
+// Interpolation for nodes close to the boundary
+// Here there's a possibility that fluid nodes lie outside of the domain, and the Dirac function
+// has to operate on fewer points.
+template<class T, template<typename U> class Descriptor, class Arithmetic, class NodeType, class Dirac>
+void interpolate_near_boundary(
+		const Box3D & dom,
+		TensorField3D<T, 3> & velocity,
+		BlockLattice3D<T, Descriptor> & lattice,
+		std::vector<NodeType> & node_container,
+		const Arithmetic & arithmetic,
+		Boundary<T> * boundary)
+{
+	Dot3D offset = velocity.getLocation();
+	Dot3D latticeOffset = lattice.getLocation();
+
+	Box3D d_bounds;
+	NoDynamics<T,Descriptor> noDynamics(1.);
+
+	for(plint it = 0; it < node_container.size(); ++it) {
+		// Dereference NodeType as a reference (it can be either a pointer or a reference)
+		typename DeduceType<NodeType>::type & node = deref_maybe(node_container[it]);
+
+		// Find compact support region of the Dirac function
+		get_dirac_compact_support_box<T, Dirac>(node.pos, d_bounds);
+
+		// Determine node topology (find points that are outside of the domain)
+		DiracWithMissingPoints<T, Dirac> dirac(node.pos);
+		if(boundary) {
+			for(plint i = d_bounds.x0; i <= d_bounds.x1; ++i) {
+				plint i2 = arithmetic.remap_index_x(i);
+				for(plint j = d_bounds.y0; j <= d_bounds.y1; ++j) {
+					plint j2 = arithmetic.remap_index_y(j);
+					for(plint k = d_bounds.z0; k <= d_bounds.z1; ++k) {
+						plint k2 = arithmetic.remap_index_z(k);
+						// Check if the fluid node or one of its neighbors is contained within the boundary
+						if(! boundary->contains(Array<T, 3>((T)i2, (T)j2, (T)k2))) {
+							geo::Rect<T> neighborhood(i2-1, i2+1, j2-1, j2+1, k2-1, k2+1);
+							if( ! boundary->does_intersect(neighborhood))
+								dirac.setNodeIsValid(i, j, k, false);
+						}
+					}
+				}
+			}
+		}
+
+		// Construct Dirac function
+		dirac.computeWeights();
+
+		// Interpolate velocity
+		node.vel.resetToZero();
+		for(plint i=0; i < dirac.count_points(); ++i) {
+			Dot3D p = dirac.get_dirac_point(i).node_pos;
+			p -= offset;
+			plint i2 = arithmetic.remap_index_x(p.x, offset.x);
+			plint j2 = arithmetic.remap_index_y(p.y, offset.y);
+			plint k2 = arithmetic.remap_index_z(p.z, offset.z);
+
+			if(contained(i2, j2, k2, dom)) {
+				node.vel += dirac.get_dirac_point(i).weight *
+						dirac.get_dirac_point(i).dirac_val *
+						velocity.get(i2, j2, k2);
+			}
+		}
+	}
+}
+
 } /* namespace interpolation */
 
 /********** Velocity interpolation **********/
 template<class T, template<typename U> class Descriptor, class Periodicity>
 void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::interpolate_velocity(
 	const Box3D & dom,
+	BlockLattice3D<T, Descriptor> & lattice,
 	TensorField3D<T, 3> & velocity)
 {
 	Profile::start_timer("interpolate");
@@ -191,6 +259,8 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::interpolate_velocit
 	// Interpolate non-local node velocity
 	interpolation::interpolate_bulk(dom, velocity, nonlocal_nodes, arithmetic, sampled_dirac);
 	interpolation::interpolate(dom, velocity, nonlocal_nodes_envelope, arithmetic, sampled_dirac);
+	interpolation::interpolate_near_boundary<T, Descriptor, ArithmeticType, NonLocalNode<T>, Dirac>(dom, velocity,
+			lattice, nonlocal_nodes_boundary, arithmetic, boundary);
 
 	// Send to appropriate processors
 	send_interpolation_data();
@@ -203,6 +273,8 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::interpolate_velocit
 	// Interpolate local
 	interpolation::interpolate_bulk(dom, velocity, local_nodes, arithmetic, sampled_dirac);
 	interpolation::interpolate(dom, velocity, local_nodes_envelope, arithmetic, sampled_dirac);
+	interpolation::interpolate_near_boundary<T, Descriptor, ArithmeticType, Vertex<T> *, Dirac>(dom, velocity,
+			lattice, local_nodes_boundary, arithmetic, boundary);
 	Profile::stop_timer("interpolate");
 
 	// Receive and reduce velocity
@@ -229,18 +301,9 @@ template<class T, template<typename U> class Descriptor, class Periodicity>
 void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::send_interpolation_data()
 {
 	comm_buffer.clear_send_buffer();
-
-	// Set receive sizes
-	/*plint element_size = 2*sizeof(plint) + sizeof(Array<T, 3>);
-	for(typename std::map<plint, MpiCommInfo<T> >::iterator it = comm_info.begin(); it != comm_info.end(); ++it) {
-		//std::cout << global::mpi().getRank() << " will get " << it->second.num_nodes_to_receive << " from " << it->first << std::endl;
-		//comm_buffer.set_recv_size(it->first, element_size * it->second.num_nodes_to_receive);
-	}*/
-
 	pack_nodes(comm_buffer, nonlocal_nodes);
 	pack_nodes(comm_buffer, nonlocal_nodes_envelope);
-
-	// Start data transfer (asynchronous)
+	pack_nodes(comm_buffer, nonlocal_nodes_boundary);
 	comm_buffer.send_and_receive_no_wait(true);
 }
 

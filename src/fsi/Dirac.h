@@ -1,6 +1,9 @@
 #ifndef DIRAC_H_
 #define DIRAC_H_
 #include "core/array.h"
+#include "core/globalDefs.h"
+#include "core/geometry3D.h"
+#include <cmath>
 
 namespace plb {
 
@@ -12,14 +15,14 @@ class PeskinDirac { };
 
 template<class T>
 struct PeskinDirac<T, 1> {
-	static T half_support;
-	static pluint support;
+	static const T half_support;
+	static const pluint support;
 };
 
 template<class T>
 struct PeskinDirac<T, 3> {
-	static T half_support;
-	static pluint support;
+	static const T half_support;
+	static const pluint support;
 
 	static T eval(T x)
 	{
@@ -37,17 +40,40 @@ struct PeskinDirac<T, 3> {
 	}
 };
 
-template<class T> pluint PeskinDirac<T, 3>::support = 4;
-template<class T> T PeskinDirac<T, 3>::half_support = 2;
+template<class T> const pluint PeskinDirac<T, 3>::support = 4;
+template<class T> const T PeskinDirac<T, 3>::half_support = 2;
 
+// 2-point dirac
+template<class T, int N>
+class TopHatDirac { };
 
+template<class T>
+struct TopHatDirac<T, 3> {
+	static const T half_support;
+	static const pluint support;
+
+	static T eval(T x)
+	{
+		return 1. - std::abs(x);
+	}
+
+	static T eval(T x, T y, T z)
+	{
+		return (1. - std::abs(x))*(1. - std::abs(y))*(1. - std::abs(z));
+	}
+};
+
+template<class T> const pluint TopHatDirac<T, 3>::support = 2;
+template<class T> const T TopHatDirac<T, 3>::half_support = 1.;
+
+// 3-point dirac (Roma et al.)
 template<class T, int N>
 class RomaDirac { };
 
 template<class T>
 struct RomaDirac<T, 3> {
-	static T half_support;
-	static pluint support;
+	static const T half_support;
+	static const pluint support;
 
 	static T eval(T x)
 	{
@@ -73,45 +99,8 @@ struct RomaDirac<T, 3> {
 	}
 };
 
-template<class T> pluint RomaDirac<T, 3>::support = 3;
-template<class T> T RomaDirac<T, 3>::half_support = 1.5;
-
-// Polynomial multiplier for higher order corrections
-template<class DiracType>
-struct DiracCorrection
-{ };
-
-template<class T>
-struct DiracCorrection<PeskinDirac<T, 2> > {
-	static T eval(T x, T y) {
-		static T b0 = -(45*M_PI*M_PI - 1830*M_PI + 8012)/(510*M_PI + 45*M_PI*M_PI - 3172);
-		static T b1 = -(120*(3*M_PI - 22))/(510*M_PI + 45*M_PI*M_PI - 3172);
-		static T b2 = b1;
-
-		return b0 + b1*x*x + b2*y*y;
-	}
-};
-
-template<class T>
-struct DiracCorrection<PeskinDirac<T, 3> > {
-	static T eval(T x, T y, T z) {
-		return 1; //3.00008797252678 - 2.23373631731956*(x*x + y*y + z*z);
-	}
-};
-
-template<class T>
-struct DiracCorrection<RomaDirac<T, 2> > {
-	static T eval(T x, T y) {
-		return 1; //2.333391981642603 - 2.233736317249337*(x*x + y*y);
-	}
-};
-
-template<class T>
-struct DiracCorrection<RomaDirac<T, 3> > {
-	static T eval(T x, T y, T z) {
-		return 1; //3.00008797252678 - 2.23373631731956*(x*x + y*y + z*z);
-	}
-};
+template<class T> const pluint RomaDirac<T, 3>::support = 3;
+template<class T> const T RomaDirac<T, 3>::half_support = 1.5;
 
 // Sample the values of a Dirac function. The eval function then uses nearest neighbour sampling
 template<class T, class Dirac, int N>
@@ -148,6 +137,43 @@ void get_dirac_compact_support_box(const Array<T, 3> & pos, Box3D & ret)
 	ret.z0 = std::ceil(pos[2] - Dirac::half_support);
 	ret.z1 = ret.z0 + Dirac::support - 1;
 }
+
+template<class T, class Dirac>
+class DiracWithMissingPoints {
+public:
+	struct DiracPoint {
+		Array<T, 3> dx;
+		Dot3D node_pos;
+		T weight;
+		T dirac_val;
+	};
+
+	DiracWithMissingPoints(const Array<T, 3> & x0) : _x0(x0),
+			_i0(std::ceil(x0[0] - Dirac::half_support), std::ceil(x0[1] - Dirac::half_support), std::ceil(x0[2] - Dirac::half_support))
+	{
+		for(plint i = 0; i < Dirac::support; ++i)
+			for(plint j = 0; j < Dirac::support; ++j)
+				for(plint k = 0; k < Dirac::support; ++k)
+					_nodeIsValid[i][j][k] = true;
+	}
+
+	void computeWeights();
+
+	plint count_points() const { return _dirac_points.size(); }
+	DiracPoint get_dirac_point(plint i) { return _dirac_points[i]; }
+
+	void setNodeIsValid(plint i, plint j, plint k, bool val)
+	{
+		_nodeIsValid[i - _i0.x][j - _i0.y][k - _i0.z] = val;
+	}
+
+private:
+	Array<T, 3> _x0;
+	Dot3D _i0;
+	std::vector<DiracPoint> _dirac_points;
+	bool _nodeIsValid[Dirac::support][Dirac::support][Dirac::support];
+};
+
 
 } /* namespace fsi */
 

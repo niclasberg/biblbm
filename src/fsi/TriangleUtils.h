@@ -146,7 +146,7 @@ inline void grad_angle_between_pair(const Array<T, 3> & v0, const Array<T, 3> & 
 	g3 = (-e1_norm / n2_norm) * n2u;
 }
 
-/* Do not use, this code is slow! */
+/*
 template<class T>
 void cos_sin_grad_angle_between_pair(
 		const Array<T, 3> & v0, const Array<T, 3> & v1, const Array<T, 3> & v2, const Array<T, 3> & v3,
@@ -271,7 +271,7 @@ void cos_sin_grad_angle_between_pair(
 	grad_sin[3][1] = sin_sign*t76*(t43*(t146+t153+t7*t18*t3856143*0.5-t15*t28*t3856143*0.5)*2.0+t42*(t147+t7*t31*t3856143*0.5-t15*t25*t3856143*0.5)*2.0+t44*(t145+t18*t25*t3856143*0.5-t28*t31*t3856143*0.5)*2.0)*0.5;
 	grad_cos[3][2] = -t147 - t148 + t3856151*0.5*(t7*t15 + t18*t28 + t25*t31);
 	grad_sin[3][2] = sin_sign*t76*(t44*(t153-t3*t25*t3841+t18*t25*t3856151*0.5-t28*t31*t3856151*0.5)*-2.0+t42*(t2*t7*t3841-t7*t31*t3856151*0.5+t15*t25*t3856151*0.5)*2.0+t43*(t152-t7*t18*t3856151*0.5+t15*t28*t3856151*0.5)*2.0)*(-1.0/2.0);
-}
+}*/
 
 /*
  * Green strain tensor for a triangular element

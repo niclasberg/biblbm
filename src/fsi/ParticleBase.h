@@ -16,6 +16,7 @@
 #include "geometry.h"
 #include "Transform.h"
 #include "RayTracer.h"
+#include "Boundary.h"
 
 namespace plb {
 
@@ -69,7 +70,7 @@ public:
 	// Fsi methods
 	virtual void reset_forces();
 	virtual void compute_forces() = 0;
-	virtual void move_vertices() = 0;
+	virtual void move_vertices(Boundary<T> * boundary = 0) = 0;
 	template<class Arithmetic> void map_center_of_mass_to_periodic_grid(const Arithmetic &);
 
 	virtual void update();
@@ -90,6 +91,8 @@ public:
 
 	// Voxelizer
 	VoxelizerType voxelizer() const { return VoxelizerType(shape_->triangles(), vertices); }
+	virtual bool should_voxelize() const = 0;
+
 
 	// Vertex iterators
 	vertex_iterator begin() { return vertices.begin(); }

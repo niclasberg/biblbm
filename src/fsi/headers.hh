@@ -26,5 +26,6 @@
 #include "Grid.hh"
 #include "SemiRigidParticle.hh"
 #include "ForceDecorator.hh"
+#include "Dirac.hh"
 
 #endif /* HEADERS_HH_ */

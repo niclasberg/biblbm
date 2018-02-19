@@ -11,6 +11,7 @@
 #include "fsi/headers.h"
 #include "fsi/headers.hh"
 #include "../common/calibrate_rbc_shape.h"
+#include "../common/rbc_parameters.h"
 #include "../common/shear_flow_setup.h"
 //#include <random>
 
@@ -24,14 +25,14 @@ int main(int argc, char ** argv)
 {
 	plbInit(&argc, &argv);
 	global::IOpolicy().activateParallelIO(true);
-	global::directories().setOutputDir("Ca0_1_lambda_5_Rep0_1_test_more_optimized2/");
+	global::directories().setOutputDir("test_dirac2/");
 	global::directories().setInputDir(global::directories().getOutputDir());
 	io::mkdir(global::directories().getOutputDir().c_str());
 
 	plint margin_y = 1;
 	plint geoNx = 36, geoNy = 38, geoNz = 36;
 	Array<double, 3> channel_mid(0.5*geoNx, 0.5*geoNy + margin_y, 0.5*geoNz);
-	plint Nt = 1000;
+	plint Nt = 100000;
 	plint output_interval = 100;
 
 	// Number of particles in each direction
@@ -53,14 +54,6 @@ int main(int argc, char ** argv)
 	ParticleShape<double> * shape = shape_library.get_by_tag("RBC");
 	double a_lb = shape->get_radius();
 
-	// Flow properties
-	/*double gamma_si = 400;
-
-	// Membrane properties
-	double G = 5.5e-6;
-	double K = 100 * 1.e-3;
-	double K_bend = 5e-18;*/
-
 	// Deduce parameters
 	double nu_lb = (tau - 0.5) / 3.0;
 	double gamma_lb = Re_p *nu_lb / (a_lb*a_lb);
@@ -72,50 +65,22 @@ int main(int argc, char ** argv)
 	double omega_inner = 1. / tau_inner;
 
 	// Membrane parameters
-	RBCParameters<double> rbc_params;
 	double G_lb = a_lb * gamma_lb * nu_lb / Ca;
-
-	// In plane properties
-	// Get average link length
-	double lavg = 0;
-	for(ParticleShape<double>::link_const_iterator it = shape->links_begin(); it != shape->links_end(); ++it)
-		lavg += it->length;
-	lavg /= shape->count_links();
-
-	rbc_params.p = 1;
-	rbc_params.L0 = lavg;
-	rbc_params.vol_desired = shape->get_volume();
-	rbc_params.Lmax = 2.2*rbc_params.L0;
-	rbc_params.k_in_plane = 1;
-	rbc_params.k_in_plane = G_lb / rbc_params.G();
-	rbc_params.compute_C();
-
-	// Bending stiffness
-	rbc_params.k_bend = k_bend_rel * G_lb * shape->get_area();
-	rbc_params.theta0 = std::acos((std::sqrt(3)*(shape->count_vertices() - 2) - 5*M_PI) / (std::sqrt(3)*(shape->count_vertices() - 2) - 3*M_PI) );
-	//rbc_params.theta0 = 0;
-
-	// Area and volume constraint
 	double K_area = (poisson_ratio + 1)/(1 - poisson_ratio) * G_lb;
-	double delta_K_area = K_area - rbc_params.K();
+	double k_bend = k_bend_rel * G_lb * shape->get_area();
+	RBCParameters<double> rbc_params = create_rbc_params(shape, G_lb,K_area, k_bend);
 
-	rbc_params.k_area_global = delta_K_area * 0.9;
-	rbc_params.k_area_local = delta_K_area * 0.1;
-	rbc_params.k_volume = 0.5*delta_K_area;
-
-	RBCParticle<double> rbc(shape_library.get_by_tag("RBC"), rbc_params);
+	RBCParticle<double> rbc(shape, rbc_params);
 
 	pcout << "RBC Parameters:" << std::endl;
 	pcout << "  Global area stiffness: " << rbc_params.k_area_global << std::endl;
 	pcout << "  Local area stiffness: " << rbc_params.k_area_local << std::endl;
 	pcout << "  Global volume stiffness: " << rbc_params.k_volume << std::endl;
 	pcout << "  Bending stiffness: " << rbc_params.k_bend << std::endl;
-	pcout << "  In-plane shear stiffness: " << rbc_params.k_in_plane << std::endl;
 	pcout << "  Equilibrium angle: " << rbc_params.theta0 << std::endl;
 	pcout << "  Shear modulus: " << rbc_params.G() << std::endl;
 	pcout << "  Area modulus " << rbc_params.K() << std::endl;
 	pcout << "  Young's modulus: " << rbc_params.youngs_modulus() << std::endl;
-	pcout << "  Area dilation energy " << rbc_params.C << std::endl;
 	pcout << "==============" << std::endl;
 	pcout << "Non-dimensional parameters:" << std::endl;
 	pcout << "  Re_p: " << gamma_lb * util::sqr(shape->get_radius()) / nu_lb << std::endl;
@@ -156,6 +121,10 @@ int main(int argc, char ** argv)
 	// Domain boundary
 	ParallelPlatesBoundary<double> boundary(margin_y, geoNy+margin_y);
 	fsi.set_boundary(&boundary);
+	//boundary.writeVTK("boundary.vtu");
+
+	WallInteraction<double, MorsePotential<double> > wall_interaction(boundary, MorsePotential<double>(1, 1e-2, 1e-4));
+	//fsi.add_force_decorator(&wall_interaction);
 
 	// Velocity and concentration fields
 	std::auto_ptr<MultiTensorField3D<double, 3> > velocity = generateMultiTensorField<double, 3>(domain);
@@ -178,7 +147,7 @@ int main(int argc, char ** argv)
 								   (double) std::rand() / (double) RAND_MAX - 0.5};
 				global::mpi().bCast(randz, 2);
 
-				Array<double, 3> pos = Array<double, 3>(x, y, z) + Array<double, 3>(0, randz[0] + 0.5*(y > (channel_mid[1]) ? -1.0 : 1.0), randz[1]);
+				Array<double, 3> pos = Array<double, 3>(x, y, z) + Array<double, 3>(0, randz[0] - 0.5*(y > (channel_mid[1]) ? -1.0 : 1.0), randz[1]);
 				rbc.set_center_of_mass(pos);
 				rbc.update();
 				fsi.add_particle(&rbc);
@@ -199,12 +168,9 @@ int main(int argc, char ** argv)
 		}
 
 		computeVelocity(lattice, *velocity, domain);
-		applyProcessingFunctional(new CouetteVelocityExtrapolator<double>(geoNy, margin_y, uMax), domain, *velocity);
-		setExternalVector(lattice, domain, DESCRIPTOR<double>::ExternalField::forceBeginsAt, Array<double, 3>(0,0,0));
-
-		applyProcessingFunctional(wrap_ibm_dynamics3D(fsi), domain, lattice, *velocity);
 
 		if((it % output_interval) == 0) {
+			pcout << "Writing flow and particle data at iteration " << it << std::endl;
 			fsi.write_particles_as_vtk(it);
 
 			// Get concentration field
@@ -214,6 +180,11 @@ int main(int argc, char ** argv)
 			vtkOut.writeData<3,float>(*velocity, "velocity", 1.);
 			vtkOut.writeData<float>(*H, "concentration", 1.);
 		}
+
+		applyProcessingFunctional(new CouetteVelocityExtrapolator<double>(geoNy, margin_y, uMax), domain, *velocity);
+		setExternalVector(lattice, domain, DESCRIPTOR<double>::ExternalField::forceBeginsAt, Array<double, 3>(0,0,0));
+
+		applyProcessingFunctional(wrap_ibm_dynamics3D(fsi), domain, lattice, *velocity);
 
 		// Compute forces and update node positions
 		Profile::start_timer("lbm");

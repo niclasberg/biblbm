@@ -30,6 +30,9 @@ struct RBCParameters {
 	void in_plane_ks(T & ks) const;
 	void in_plane_ks_kp(T l0, T & ks, T & kp) const;
 
+	T cos_theta0() const;
+	T sin_theta0() const;
+
 	template<class BufferType> void pack(BufferType &) const;
 	template<class BufferType> void unpack(BufferType &);
 
@@ -67,9 +70,8 @@ public:
 	virtual RBCParticle * clone() const { return new RBCParticle(*this); };
 
 	virtual plint get_type_id() const { return type_id; }
-
 	virtual void compute_forces();
-	void relax_nodes(T, T);
+	void relax_nodes(T);
 	template<class Stream> void print_energies(Stream &) const;
 
 	virtual void pack(std::vector<char> &) const;
@@ -77,6 +79,7 @@ public:
 	virtual void unpack(std::istream &);
 
 	// Getters
+	virtual bool should_voxelize() const { return true; }
 	RBCParameters<T> & params() { return params_; }
 	const RBCParameters<T> & params() const { return params_; }
 

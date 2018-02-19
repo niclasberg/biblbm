@@ -17,6 +17,7 @@
 #include "geometry.h"
 #include "ZBuffer.h"
 #include "ForceDecorator.h"
+#include "Boundary.h"
 #include "ParticleParticleInteraction.h"
 
 namespace plb {
@@ -50,6 +51,7 @@ template<class T, template<typename U> class Descriptor, class Periodicity>
 class ImmersedBoundaryDynamics3D {
 private:
 	// Typedefs
+	//typedef TopHatDirac<T, 3> Dirac;
 	typedef RomaDirac<T, 3> Dirac;
 
 public:
@@ -78,7 +80,7 @@ public:
 
 	// Fsi methods
 	void set_forces_to_zero();
-	void interpolate_velocity(const Box3D &, TensorField3D<T, 3> &);
+	void interpolate_velocity(const Box3D &, BlockLattice3D<T, Descriptor> &, TensorField3D<T, 3> &);
 	void compute_and_spread_forces(const Box3D &, BlockLattice3D<T, Descriptor> &);
 	void move_vertices_and_revoxelize(const Box3D &, BlockLattice3D<T, Descriptor> &);
 	void move_vertices();
@@ -87,6 +89,8 @@ public:
 	// Add a particle to the simulation. Only particles contained in the domain of
 	// this processor are saved.
 	void add_particle(const ParticleType *);
+
+	void set_boundary(Boundary<T> * boundary_) { this->boundary = boundary_; }
 
 	// Particle access
 	ObjMapIterator particles_begin() { return particles.begin(); }
@@ -117,9 +121,6 @@ private:
 	void find_blocks_in_domain(const geo::Rect<T> & bb, std::vector<plint> & neighboring_blocks) const;
 
 	// Velocity interpolation methods
-	void reset_velocities();
-	template<class NodeType>
-	void interpolate_velocity_impl(const Box3D &, TensorField3D<T, 3> &, std::vector<NodeType> &);
 	void send_interpolation_data();
 	void receive_and_reduce_interpolation_data();
 
@@ -166,6 +167,8 @@ private:
 	geo::Rect<T> local_particle_bounding_box() const;
 
 private:
+	Boundary<T> * boundary;
+
 	// Mpi communication
 	CommunicationBuffer comm_buffer;
 	std::map<plint, MpiCommInfo<T> > comm_info;
@@ -174,14 +177,17 @@ private:
 	SampledDirac<T, Dirac, 3> sampled_dirac;
 
 	// Node containers
-	std::vector<Vertex<T> *> local_nodes;			// Nodes belonging to
-	std::vector<Vertex<T> *> local_nodes_envelope;	// Nodes belonging to
+	std::vector<Vertex<T> *> local_nodes;
+	std::vector<Vertex<T> *> local_nodes_envelope;
+	std::vector<Vertex<T> *> local_nodes_boundary;
 	std::vector<NonLocalNode<T> > nonlocal_nodes;
 	std::vector<NonLocalNode<T> > nonlocal_nodes_envelope;
+	std::vector<NonLocalNode<T> > nonlocal_nodes_boundary;
 	std::map<plint, plint> particle_start_id_;
 
 	// Geometry arithmetic (contains all methods to implement periodicity)
-	typename Periodicity::ArithmeticType arithmetic;
+	typedef typename Periodicity::ArithmeticType ArithmeticType;
+	ArithmeticType arithmetic;
 
 	// Library of all particle shapes
 	const ParticleShapeLibrary<T> & shape_library;

@@ -52,6 +52,18 @@ void RBCParameters<T>::in_plane_ks_kp(T l0, T & ks, T & kp) const
 }
 
 template<class T>
+T RBCParameters<T>::cos_theta0() const
+{
+	return std::cos(this->theta0);
+}
+
+template<class T>
+T RBCParameters<T>::sin_theta0() const
+{
+	return std::sin(this->theta0);
+}
+
+template<class T>
 void RBCParameters<T>::in_plane_C(T & C) const
 {
 	static T factor = (4*x0*x0 - 9*x0 + 6) / ((1-x0)*(1-x0));
@@ -228,10 +240,11 @@ void RBCParticle<T>::compute_forces()
 		max_df_vol = std::max(std::abs(df_vol), max_df_vol);
 	}
 
-	//pcout << "Link: " << max_df_link << ", Area: " << max_df_area << ", Volume: " << max_df_vol << std::endl;
+	//std::cout << "Link: " << max_df_link << ", Area: " << max_df_area << ", Volume: " << max_df_vol << std::endl;
 
 	// Bending forces
 	T cos_theta, sin_theta;
+	T cos_theta0 = params().cos_theta0(), sin_theta0 = params().sin_theta0();
 	//Array<Array<T, 3>, 4> grad_cos_theta, grad_sin_theta;
 	Array<Array<T, 3>, 4> grad_theta;
 	for(triangle_pair_iterator it = this->shape()->triangle_pairs_begin();
@@ -252,7 +265,7 @@ void RBCParticle<T>::compute_forces()
 		// The potential is U = kb(1 - cos(theta-theta0)) = kb*(1 - cos(theta)cos(theta0) + sin(theta)sin(theta0))
 		// Hence, the force is F = -grad(U) = kb(cos(theta0)grad(cos(theta)) - sin(theta0)grad(sin(theta))) or
 		// F = -kb(cos(theta0)sin(theta) + sin(theta0)cos(theta))grad(theta)
-		T prefactor = -params().k_bend * (it->cos_theta0 * sin_theta + it->sin_theta0 * cos_theta);
+		T prefactor = -params().k_bend * (cos_theta0 * sin_theta + sin_theta0 * cos_theta);
 		v0.force += prefactor * grad_theta[0];
 		v1.force += prefactor * grad_theta[1];
 		v2.force += prefactor * grad_theta[2];
@@ -278,14 +291,14 @@ void RBCParticle<T>::print_energies(Stream & out) const
 
 		const Array<T, 3> dv = v0.pos - v1.pos;
 		const T L = norm(dv);
-		const T Lmax = 2.2*it->length;
-		const T xi = L / Lmax;
 		const T x0 = 1 / 2.2;
+		const T Lmax = it->length / x0;
+		const T xi = L / Lmax;
 
 		T ks, kp;
 		params().in_plane_ks_kp(it->length, ks, kp);
 
-		E_in_plane += ks*Lmax*((3*xi*xi - 2*xi*xi*xi) / (4.*(1 - xi)) - (3*x0*x0 - 2*x0*x0*x0) / (4.*(1 - x0))) + kp / L - kp / it->length;
+		E_in_plane += ks*Lmax*(3*xi*xi - 2*xi*xi*xi) / (4.*(1 - xi)) + kp / L;
 	}
 
 	// Contribution from triangle level forces
@@ -298,18 +311,18 @@ void RBCParticle<T>::print_energies(Stream & out) const
 		//E_in_plane += params().C / local_area;
 
 		// Global area constraint
-		E_area += params().k_area_global / (2. * this->shape()->get_area()) * util::sqr(this->shape()->get_area() - this->area());
+		E_area += params().k_area_global / (2. * this->shape()->get_area()) * util::sqr(this->area() - this->shape()->get_area());
 
 		// Local area constraint
 		E_area += params().k_area_local / (2. * it->area) * util::sqr(it->area - local_area);
 
 		// Volume constraint
-		E_vol += params().k_volume / (2 * params().vol_desired) * util::sqr(params_.vol_desired - this->volume());
+		E_vol += params().k_volume / (2 * params().vol_desired) * util::sqr(this->volume() - params_.vol_desired);
 	}
 
 	// Bending energy
 	T sin_theta, cos_theta;
-	T sin_theta0 = std::sin(params().theta0), cos_theta0 = std::cos(params().theta0);
+	T cos_theta0 = params().cos_theta0(), sin_theta0 = params().sin_theta0();
 	for(triangle_pair_iterator it = this->shape()->triangle_pairs_begin();
 			it != this->shape()->triangle_pairs_end(); ++it) {
 
@@ -320,7 +333,7 @@ void RBCParticle<T>::print_energies(Stream & out) const
 				this->get_node(it->i3).pos,
 				cos_theta, sin_theta);
 
-		E_bend += params().k_bend * (1 - (cos_theta*it->cos_theta0 - sin_theta*it->sin_theta0));
+		E_bend += params().k_bend * (1 - (cos_theta*cos_theta0 - sin_theta*sin_theta0));
 	}
 
 	out << "In plane: " << E_in_plane << ", Bending: " << E_bend << ", Volume constraint: " << E_vol << ", Area constraint: " << E_area << std::endl;
@@ -328,11 +341,24 @@ void RBCParticle<T>::print_energies(Stream & out) const
 
 
 template<class T>
-void RBCParticle<T>::relax_nodes(T m, T damping)
+void RBCParticle<T>::relax_nodes(T damping)
 {
+	typedef typename ParticleShape<T>::triangle_const_iterator triangle_iterator;
+
+	// Compute node masses
+	std::vector<T> M(this->count_nodes(), T());
+	for(triangle_iterator it = this->shape()->triangles_begin();
+				it != this->shape()->triangles_end(); ++it) {
+		T local_area = tri::triangle_area(this->get_node(it->i0).pos, this->get_node(it->i1).pos, this->get_node(it->i2).pos);
+		M[it->i0] += local_area / 3.;
+		M[it->i1] += local_area / 3.;
+		M[it->i2] += local_area / 3.;
+	}
+
 	// Semi-implicit Euler integration
-	for(vertex_iterator it = this->begin(); it != this->end(); ++it) {
-		it->vel += it->force / m - damping*it->vel;
+	plint ni = 0;
+	for(vertex_iterator it = this->begin(); it != this->end(); ++it, ++ni) {
+		it->vel += it->force / M[ni] - damping*it->vel;
 		it->pos += it->vel;
 	}
 

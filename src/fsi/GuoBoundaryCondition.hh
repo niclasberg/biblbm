@@ -93,23 +93,24 @@ void GuoRigidWallBoundaryInstantiator<T, Descriptor>::process(Box3D domain, Bloc
 						Array<T, 3> dir2(dir.x, dir.y, dir.z);
 
 						// Check if neighbour is a fluid node
-						if(model_.boundary().contains(pos+dir2)) {
+						T t;
+						if(model_.boundary().trace_ray(pos, pos+dir2, t)) {
 							//Normalized lattice vector
 							dir2 /= dir_norms[iDir];
 
-							T dist = model_.boundary().distance_to_boundary(pos, dir2);
-							Array<T, 3> wall_pos = pos + dir2*dist;
+							//T dist = t * dir_norms[iDir]; //model_.boundary().distance_to_boundary(pos, dir2);
+							Array<T, 3> wall_pos = pos + dir2*t;
 
-							if(dist >= 0 && dist <= dir_norms[iDir]) {
-								Array<T, 3> normal = model_.boundary().get_normal(wall_pos);
-								T cos_angle = dot(normal, dir2);
-								if(cos_angle < cos_angle_min) {
-									dir_min = dir;
-									cos_angle_min = cos_angle;
-									delta_min = 1 - dist/dir_norms[iDir];
-									wall_pos_min = wall_pos;
-								}
+							//if(dist >= 0 && dist <= dir_norms[iDir]) {
+							Array<T, 3> normal = model_.boundary().get_normal(wall_pos);
+							T cos_angle = dot(normal, dir2);
+							if(cos_angle < cos_angle_min) {
+								dir_min = dir;
+								cos_angle_min = cos_angle;
+								delta_min = 1 - t;//dist/dir_norms[iDir];
+								wall_pos_min = wall_pos;
 							}
+							//}
 
 							success = true;
 						}
@@ -156,8 +157,8 @@ void GuoRigidWallBoundaryFunctional<T, Descriptor>::process(Box3D domain, BlockL
 															 pos_rel.z + 2*it->direction.z);
 
 		// Correct the wall velocity (remove the force component)
-		for (int iD=0; iD<Descriptor<T>::d; ++iD)
-			wall_vel[iD] = it->velocity[iD] - (T)0.5*getExternalForceComponent(cell,iD);
+		//for (int iD=0; iD<Descriptor<T>::d; ++iD)
+		//	wall_vel[iD] = it->velocity[iD] - (T)0.5*getExternalForceComponent(cell,iD);
 
 		// Evaluate non-equilibrium part of the distribution function
 		cell1.getDynamics().computeRhoBarJ(cell1, rhoBar1, j1);

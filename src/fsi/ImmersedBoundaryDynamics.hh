@@ -36,7 +36,8 @@ ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::ImmersedBoundaryDynamics
   ny(lattice.getNy()),
   nz(lattice.getNz()),
   is_init_(false),
-  z_buffer(arithmetic)
+  z_buffer(arithmetic),
+  boundary(0)
 {
 	initialize_domains();
 }
@@ -144,8 +145,10 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::clear_nodes()
 {
 	local_nodes.clear();
 	local_nodes_envelope.clear();
+	local_nodes_boundary.clear();
 	nonlocal_nodes.clear();
 	nonlocal_nodes_envelope.clear();
+	nonlocal_nodes_boundary.clear();
 }
 
 /********** Initialization **********/
@@ -329,12 +332,12 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::create_nodes()
 template<class T, template<typename U> class Descriptor, class Periodicity>
 void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::add_nonlocal_node(NonLocalNode<T> & node)
 {
-	NonLocalNode<T> * ptr = 0;
-	if(bulk_domain.contains(node.pos, arithmetic)) {
+	if(boundary && boundary->distance_to_boundary_less_than(node.pos, Dirac::half_support))
+		nonlocal_nodes_boundary.push_back(node);
+	else if(bulk_domain.contains(node.pos, arithmetic))
 		nonlocal_nodes.push_back(node);
-	} else {
+	else
 		nonlocal_nodes_envelope.push_back(node);
-	}
 }
 
 template<class T, template<typename U> class Descriptor, class Periodicity>
@@ -342,7 +345,9 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::create_nodes_from_p
 {
 	for(typename ParticleBase3D<T>::vertex_iterator it = p.begin(); it != p.end(); ++it) {
 		if(domain_with_fsi_envelope.contains(it->pos, arithmetic)) {
-			if(bulk_domain.contains(it->pos, arithmetic))
+			if(boundary && boundary->distance_to_boundary_less_than(it->pos, Dirac::half_support))
+				local_nodes_boundary.push_back(&(*it));
+			else if(bulk_domain.contains(it->pos, arithmetic))
 				local_nodes.push_back(&(*it));
 			else
 				local_nodes_envelope.push_back(&(*it));
@@ -480,7 +485,7 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::move_vertices_impl(
 {
 	// Integrate the equations of motion for all particles
 	for(ObjMapIterator it = particles.begin(); it != particles.end(); ++it) {
-		it->second->move_vertices();
+		it->second->move_vertices(boundary);
 		it->second->map_center_of_mass_to_periodic_grid(arithmetic);
 	}
 }

@@ -23,7 +23,7 @@ public:
 	DeformableParticle3D(const ParticleShape<T> * shape);
 	virtual ~DeformableParticle3D() { }
 
-	virtual void move_vertices();
+	virtual void move_vertices(Boundary<T> * boundary = 0);
 	virtual void update();
 
 	void compute_tensor_of_gyration(Matrix<T, 3> &) const;

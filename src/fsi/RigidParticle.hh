@@ -53,7 +53,7 @@ void RigidParticle3D<T>::reset_forces()
 }
 
 template<class T>
-void RigidParticle3D<T>::move_vertices()
+void RigidParticle3D<T>::move_vertices(Boundary<T> * boundary)
 {
 	// Compute total torque and force
 	this->force().resetToZero();

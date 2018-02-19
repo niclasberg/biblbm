@@ -31,14 +31,14 @@ void shrink_rbc_volume(plb::fsi::RBCParticle<T> & rbc, T vol_final, int N_it, T 
 
 			if(it <= N_it)
 				rbc2.params().vol_desired = vol_start + ((T)it / (T)N_it) * (vol_final - vol_start);
-			rbc2.relax_nodes(m, damping);
+			rbc2.relax_nodes(damping);
 
 			// Check if the iteration has diverged (i.e. if area == NaN)
 			// The c++ floating point specification defines that NaN != NaN.
 			if(rbc2.area() != rbc2.area()) {
-				m *= 2;
+				damping *= 2.;
 				success = false;
-				plb::pcout << "Calibration failed, retrying with m = " << m << std::endl;
+				plb::pcout << "Calibration failed, retrying with damping = " << damping << std::endl;
 				break;
 			}
 

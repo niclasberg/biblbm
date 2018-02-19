@@ -54,6 +54,8 @@ public:
 		}
 	}
 
+	virtual bool trace_ray(const Array<T, 3> & x0, const Array<T, 3> & x1, T & t) const = 0;
+
 	void writeVTK(std::string filename) {
 		if(global::mpi().isMainProcessor()) {
 			std::vector<Array<T, 3> > vertices;
@@ -145,7 +147,7 @@ public:
 
 	virtual bool contains(const Array<T,3> & pos, T margin = 0) const
 	{
-		return (pos[0] >= x0 && pos[0] <= x0+length) && (util::sqr(pos[1]-y0) + util::sqr(pos[2]-z0)) < util::sqr(radius - margin);
+		return (util::sqr(pos[1]-y0) + util::sqr(pos[2]-z0)) < util::sqr(radius - margin);
 	}
 
 	virtual bool distance_to_boundary_less_than(const Array<T, 3> & pos, T dist) const
@@ -156,6 +158,31 @@ public:
 	virtual T distance_to_boundary(const Array<T, 3> & pos) const
 	{
 		return radius - std::sqrt(util::sqr(pos[1]-y0) + util::sqr(pos[2]-z0));
+	}
+
+	virtual bool trace_ray(const Array<T, 3> & x0, const Array<T, 3> & x1, T & t) const
+	{
+		const T y1 = x0[1]-y0, y2 = x1[1]-y0, z1 = x0[2]-z0, z2 = x1[2]-z0;
+
+		const T a = (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1);
+		const T b = y1*(y2-y1) + z1*(z2-z1);
+		const T c = y1*y1 + z1*z1 - radius*radius;
+
+		// Check if a real solution exists
+		const T disc = b*b - c*a;
+		if(disc < 0. || std::abs(a) < 10*std::numeric_limits<T>::epsilon())
+			return false;
+		const T bOverA = -b/a;
+		const T sqrtDisc = std::sqrt(disc)/a;
+
+		// Test both roots
+		t = bOverA - sqrtDisc;
+		if(t >= 0. && t <= 1.)
+			return true;
+		t = bOverA + sqrtDisc;
+		if(t >= 0. && t <= 1.)
+			return true;
+		return false;
 	}
 
 	/**
@@ -311,6 +338,19 @@ public:
 		// Evaluate distance to the boundaries (elementary trigonometry)
 		return (r[1] < 0.5*(y0+y1)) ?
 				(y0 - r[1]) * norm(dir) / dir[1] : (y1 - r[1]) * norm(dir) / dir[1];
+	}
+
+	virtual bool trace_ray(const Array<T, 3> & x0, const Array<T, 3> & x1, T & t) const
+	{
+		// Upper plate
+		t = (y1 - x0[1]) / (x1[1] - x0[1]);
+		if(t > 0 && t < 1)
+			return true;
+		// Lower plate
+		t = (y0 - x0[1]) / (x1[1] - x0[1]);
+		if(t > 0 && t < 1)
+			return true;
+		return false;
 	}
 
 	virtual Array<T, 3> get_normal(const Array<T, 3> & r) const

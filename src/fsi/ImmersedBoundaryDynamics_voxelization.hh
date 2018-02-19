@@ -24,7 +24,8 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::voxelize()
 	z_buffer.clear();
 
 	for(ObjMapIterator it = particles.begin(); it != particles.end(); ++it)
-		it->second->voxelizer().find_intersections_z(z_buffer);
+		if(it->second->should_voxelize())
+			it->second->voxelizer().find_intersections_z(z_buffer);
 }
 
 template<class T, template<typename U> class Descriptor, class Periodicity>

@@ -39,9 +39,9 @@ usePOSIX     = false
 useCVMLCPP   = false
 
 # Path to external libraries (other than Palabos)
-libraryPaths = 
+libraryPaths = ../../externalLibraries/lib
 # Path to inlude directories (other than Palabos)
-includePaths = 
+includePaths = ../../externalLibraries/include
 # Dynamic and static libraries (other than Palabos)
 libraries    =
 
@@ -50,15 +50,22 @@ serialCXX    = gcc
 # Compiler to use with MPI parallelism
 parallelCXX  = /usr/bin/mpicxx
 # General compiler flags (e.g. -Wall to turn on all warnings on g++)
-compileFlags = -fpermissive
+compileFlags = -fpermissive -lnlopt
 # General linker flags (don't put library includes into this flag)
-linkFlags    = 
+linkFlags    = -lnlopt
 # Compiler flags to use when optimization mode is on
 optimFlags   = -O3
 # Compiler flags to use when debug mode is on
 debugFlags   = -g
 # Compiler flags to use when profile mode is on
 profileFlags = -pg
+
+# Special flags for different clusters
+HOST = $(shell hostname)
+ifneq (, $(findstring hpc2n.umu.se,$(HOST)))
+	parallelCXX = mpiCC
+	serialCXX = mpiCC
+endif
 
 
 ##########################################################################

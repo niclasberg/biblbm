@@ -191,6 +191,64 @@ void spread_forces_bulk(
 	spread_forces_impl<T, Descriptor, Dirac, Arithmetic, NodeType, BulkSpreading<T, Dirac> >(dom, lattice, node_container, arithmetic, sampled_dirac);
 }
 
+// Boundary spreading. Here we account for that some grid points may lie outside of the domain.
+// A Dirac function will be formed including only the points that are within the domain.
+// The remaining points will be weighted such that the moment conditions:
+//   sum dirac(x-X) = 1
+//   sum (x-X)*dirac(x-X) = 0
+// still hold.
+template<class T, template<typename U> class Descriptor, class Dirac, class Arithmetic, class NodeType>
+void spread_forces_near_boundary(
+		const Box3D & dom,
+		BlockLattice3D<T, Descriptor> & lattice,
+		std::vector<NodeType> & node_container,
+		const Arithmetic & arithmetic,
+		Boundary<T> * boundary)
+{
+	Dot3D offset = lattice.getLocation();
+	Box3D d_bounds;
+
+	for(plint it = 0; it < node_container.size(); ++it) {
+		// Dereference NodeType as a reference (it can be either a pointer or a reference)
+		typename DeduceType<NodeType>::type & node = deref_maybe(node_container[it]);
+
+		// Find compact support region of the Dirac function
+		get_dirac_compact_support_box<T, Dirac>(node.pos, d_bounds);
+
+		// Determine node topology (find points that are outside of the domain)
+		DiracWithMissingPoints<T, Dirac> dirac(node.pos);
+		for(plint i = d_bounds.x0; i <= d_bounds.x1; ++i) {
+			plint i2 = arithmetic.remap_index_x(i);
+			for(plint j = d_bounds.y0; j <= d_bounds.y1; ++j) {
+				plint j2 = arithmetic.remap_index_y(j);
+				for(plint k = d_bounds.z0; k <= d_bounds.z1; ++k) {
+					plint k2 = arithmetic.remap_index_z(k);
+					if( ! boundary->contains(Array<T, 3>((T)i2, (T)j2, (T)k2))) {
+						dirac.setNodeIsValid(i, j, k, false);
+					}
+				}
+			}
+		}
+
+		// Construct Dirac function
+		dirac.computeWeights();
+
+		// Spread forces
+		for(plint i=0; i < dirac.count_points(); ++i) {
+			Dot3D p = dirac.get_dirac_point(i).node_pos;
+			p -= offset;
+			plint i2 = arithmetic.remap_index_x(p.x, offset.x);
+			plint j2 = arithmetic.remap_index_y(p.y, offset.y);
+			plint k2 = arithmetic.remap_index_z(p.z, offset.z);
+
+			if(contained(i2, j2, k2, dom)) {
+				add_to_cArray(lattice.get(i2, j2, k2).getExternal(Descriptor<T>::ExternalField::forceBeginsAt),
+						dirac.get_dirac_point(i).weight * dirac.get_dirac_point(i).dirac_val * node.force);
+			}
+		}
+	}
+}
+
 } /* namespace spreading */
 
 /******** Compute and spread forces ********/
@@ -223,10 +281,12 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::compute_and_spread_
 			reduce_nonlocal_node_forces(it);
 	}
 
-	// Spread non-local forces and forces in the envelope
+	// Spread non-local forces and forces in the envelope and boundary
 	spreading::spread_forces(dom, lattice, local_nodes_envelope, arithmetic, sampled_dirac);
 	spreading::spread_forces_bulk(dom, lattice, nonlocal_nodes, arithmetic, sampled_dirac);
 	spreading::spread_forces(dom, lattice, nonlocal_nodes_envelope, arithmetic, sampled_dirac);
+	spreading::spread_forces_near_boundary<T, Descriptor, Dirac, ArithmeticType, Vertex<T> * >(dom, lattice, local_nodes_boundary, arithmetic, boundary);
+	spreading::spread_forces_near_boundary<T, Descriptor, Dirac, ArithmeticType, NonLocalNode<T> >(dom, lattice, nonlocal_nodes_boundary, arithmetic, boundary);
 	Profile::stop_timer("spread_forces");
 }
 
@@ -260,6 +320,8 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::set_forces_to_zero(
 		nonlocal_nodes[i].force.resetToZero();
 	for(plint i = 0; i < nonlocal_nodes_envelope.size(); ++i)
 		nonlocal_nodes_envelope[i].force.resetToZero();
+	for(plint i = 0; i < nonlocal_nodes_boundary.size(); ++i)
+		nonlocal_nodes_boundary[i].force.resetToZero();
 }
 
 namespace detail {
@@ -369,14 +431,14 @@ template<class T, template<typename U> class Descriptor, class Periodicity>
 void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::pack_nonlocal_node_forces()
 {
 	// Just save pointers to the nonlocal node arrays to avoid code duplication
-	std::vector<NonLocalNode<T> > * containers[2] = {&nonlocal_nodes, &nonlocal_nodes_envelope };
+	std::vector<NonLocalNode<T> > * containers[3] = {&nonlocal_nodes, &nonlocal_nodes_envelope, &nonlocal_nodes_boundary };
 
 	// Count the number of nodes to send to each proc
 	std::map<plint, plint> sizes;
 	for(typename std::map<plint, MpiCommInfo<T> >::iterator it = comm_info.begin(); it != comm_info.end(); ++it)
 		sizes[it->first] = 0;
 
-	for(plint ci = 0; ci < 2; ++ci) {
+	for(plint ci = 0; ci < 3; ++ci) {
 		std::vector<NonLocalNode<T> > & nodes = *(containers[ci]);
 		for(plint i = 0; i < nodes.size(); ++i) {
 			sizes.at(nodes[i].proc_id) += 1;
@@ -388,7 +450,7 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::pack_nonlocal_node_
 		comm_buffer.pack(it->first, it->second);
 
 	// Pack data
-	for(plint ci = 0; ci < 2; ++ci) {
+	for(plint ci = 0; ci < 3; ++ci) {
 		std::vector<NonLocalNode<T> > & nodes = *(containers[ci]);
 		for(plint i = 0; i < nodes.size(); ++i) {
 			const NonLocalNode<T> & node = nodes[i];
@@ -404,8 +466,8 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::unpack_local_partic
 {
 	// Put pointers to the nodes in a hash map for faster lookup
 	std::tr1::unordered_map<plint, NonLocalNode<T> *> nonlocal_node_map;
-	std::vector<NonLocalNode<T> > * containers[2] = {&nonlocal_nodes, &nonlocal_nodes_envelope };
-	for(int ci = 0; ci < 2; ++ci) {
+	std::vector<NonLocalNode<T> > * containers[3] = {&nonlocal_nodes, &nonlocal_nodes_envelope , &nonlocal_nodes_boundary };
+	for(int ci = 0; ci < 3; ++ci) {
 		std::vector<NonLocalNode<T> > & nodes = *(containers[ci]);
 		for(plint i = 0; i < nodes.size(); ++i) {
 			NonLocalNode<T> & node = nodes[i];

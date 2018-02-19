@@ -23,11 +23,30 @@ DeformableParticle3D<T>::DeformableParticle3D(const ParticleShape<T> * shape)
 }
 
 template<class T>
-void DeformableParticle3D<T>::move_vertices()
+void DeformableParticle3D<T>::move_vertices(Boundary<T> * boundary)
 {
 	// Integrate with Explicit Euler
-	for(vertex_iterator it = this->begin(); it != this->end(); ++it)
-		it->pos += it->vel;
+	if(!boundary) {
+		for(vertex_iterator it = this->begin(); it != this->end(); ++it)
+			it->pos += it->vel;
+	} else {
+		// Prevent vertices from escaping the domain by "bouncing" them off the wall
+		for(vertex_iterator it = this->begin(); it != this->end(); ++it) {
+			Array<T, 3> posOld = it->pos;
+			it->pos += it->vel;
+			T tImpact;
+			if(boundary->trace_ray(posOld, it->pos, tImpact)) {
+				//std::cout << "COLLISION pre:" << posOld[0] << ", " << posOld[1] << ", " << posOld[2];
+				// Collision point
+				it->pos = posOld + tImpact*it->vel;
+				//std::cout << ", collPnt: " << it->pos[0] << ", " << it->pos[1] << ", " << it->pos[2];
+				Array<T, 3> normal = boundary->get_normal(it->pos);
+				Array<T, 3> velPostColl = it->vel - 2.*dot(it->vel, normal)*normal;
+				it->pos += velPostColl * (1. - tImpact);
+				//std::cout << ", post: " << it->pos[0] << ", " << it->pos[1] << ", " << it->pos[2] << std::endl;
+			}
+		}
+	}
 	update();
 }
 

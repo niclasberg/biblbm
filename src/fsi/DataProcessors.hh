@@ -102,7 +102,7 @@ void ImmersedBoundaryWrapperFunctional3D<T, Descriptor, Periodicity>::process(
 		exit(-1);
 	}
 
-	ibm.interpolate_velocity(domain, velocity);
+	ibm.interpolate_velocity(domain, lattice, velocity);
 	ibm.compute_and_spread_forces(domain, lattice);
 	ibm.move_vertices_and_revoxelize(domain, lattice);
 }

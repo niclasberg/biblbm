@@ -27,11 +27,12 @@ public:
 	virtual RigidParticle3D * clone() const { return new RigidParticle3D(*this); }
 
 	virtual void update();
-	virtual void move_vertices();
+	virtual void move_vertices(Boundary<T> * boundary = 0);
 	virtual void compute_forces();
 	virtual void reset_forces();
 
 	// Getters
+	virtual bool should_voxelize() const { return false; }
 	Array<T, 3> & velocity() { return velocity_; }
 	const Array<T, 3> & velocity() const { return velocity_; }
 	Array<T, 3> & angular_velocity() { return ang_velocity_; }

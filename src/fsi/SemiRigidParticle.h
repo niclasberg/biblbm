@@ -55,6 +55,7 @@ public:
 	virtual void unpack(std::istream &);
 
 	// Getters
+	virtual bool should_voxelize() const { return false; }
 	SemiRigidParticleParams<T> & params() { return params_; }
 	const SemiRigidParticleParams<T> & params() const { return params_; }
 
