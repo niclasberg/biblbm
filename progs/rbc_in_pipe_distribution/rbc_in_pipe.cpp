@@ -421,7 +421,7 @@ void create_particles(
 			// Create a boundary that is a little bit smaller than the actual one,
 			// this ensures that all particles are within the domain
 			PipeBoundary<T> boundary2 = pipe_boundary;
-			//boundary2.radius = pipe_boundary.radius - 1.5;
+			boundary2.radius = pipe_boundary.radius - 1.5;
 
 			plint num_particles = 0;
 			T max_radius = 0;
