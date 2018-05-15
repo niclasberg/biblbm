@@ -175,6 +175,34 @@ template<class T, template<typename U> class Descriptor, class Periodicity>
 ImmersedBoundaryWrapperFunctional3D<T, Descriptor, Periodicity> *
 wrap_ibm_dynamics3D(ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity> & ibm);
 
+template<class T, template<typename U> class Descriptor>
+class VelocityComputer3D : public BoxProcessingFunctional3D_LT<T, Descriptor, T, 3> {
+public:
+	VelocityComputer3D()
+	{ }
+
+	virtual void process(Box3D domain, BlockLattice3D<T,Descriptor>& lattice, TensorField3D<T,3>& field);
+
+	virtual VelocityComputer3D * clone() const
+	{
+		return new VelocityComputer3D(*this);
+	}
+
+	virtual BlockDomain::DomainT appliesTo() const {
+		return BlockDomain::bulk;
+	}
+
+	virtual void getModificationPattern(std::vector<bool>& isWritten) const {
+		isWritten[0] = false;
+		isWritten[1] = true;
+	}
+
+	virtual void getTypeOfModification(std::vector<modif::ModifT> & modified) const {
+		modified[0] = modif::nothing;
+		modified[1] = modif::staticVariables;
+	}
+};
+
 }
 
 }

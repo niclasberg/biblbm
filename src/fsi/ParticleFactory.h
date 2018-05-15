@@ -43,7 +43,7 @@ public:
 	template<class BufferType>
 	ParticleBase3D<T> * create(BufferType & buff, const ParticleShapeLibrary<T> & shape_library)
 	{
-		plint type_id, shape_id;
+		plint type_id = -1, shape_id = -1;
 		utils::unpack(buff, type_id);
 		utils::unpack(buff, shape_id);
 
@@ -59,6 +59,8 @@ public:
 
 		return ret;
 	}
+
+	void clean_up();
 
 	plint register_factory(detail::ParticleCreatorBase<T> *);
 

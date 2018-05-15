@@ -71,7 +71,7 @@ void DiracWithMissingPoints<T, Dirac>::computeWeights() {
 					p.weight = 1.;
 					_dirac_points.push_back(p);
 					bb.x0 = std::min(bb.x0, i);
-					bb.x1 = std::max(bb.x1, i);
+					bb.x1 = std::max(bb.x1, i); 
 					bb.y0 = std::min(bb.y0, j);
 					bb.y1 = std::max(bb.y1, j);
 					bb.z0 = std::min(bb.z0, k);
@@ -116,7 +116,7 @@ void DiracWithMissingPoints<T, Dirac>::computeWeights() {
 		for(int i = 0; i < _dirac_points.size(); ++i)
 			dirac_sum += _dirac_points[i].dirac_val;
 		for(int i = 0; i < _dirac_points.size(); ++i)
-			_dirac_points[i].weight = 1./dirac_sum;
+			_dirac_points[i].weight = 1. / dirac_sum;
 	}
 }
 

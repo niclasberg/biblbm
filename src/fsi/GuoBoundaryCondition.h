@@ -110,6 +110,34 @@ private:
 	GuoRigidWallBoundary<T, Descriptor> & model_;
 };
 
+template<class T, template<typename U> class Descriptor>
+class GuoRigidWallBoundaryDebugger : public BoxProcessingFunctional3D_S<T> {
+public:
+	GuoRigidWallBoundaryDebugger(GuoRigidWallBoundary<T, Descriptor> & model) : model_(model) { }
+
+	virtual void process(Box3D domain, ScalarField3D<T> &);
+
+	virtual GuoRigidWallBoundaryDebugger * clone() const
+	{
+		return new GuoRigidWallBoundaryDebugger(*this);
+	}
+
+	virtual BlockDomain::DomainT appliesTo() const {
+		return BlockDomain::bulk;
+	}
+
+	virtual void getModificationPattern(std::vector<bool>& isWritten) const {
+		isWritten[0] = true;
+	}
+
+	virtual void getTypeOfModification(std::vector<modif::ModifT> & modified) const {
+		modified[0] = modif::staticVariables;
+	}
+
+private:
+	GuoRigidWallBoundary<T, Descriptor> & model_;
+};
+
 }
 
 }

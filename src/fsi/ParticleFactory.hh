@@ -38,6 +38,14 @@ plint ParticleFactory<T>::register_factory(detail::ParticleCreatorBase<T> * fact
 	return factories_.size()-1;
 }
 
+template<class T>
+void ParticleFactory<T>::clean_up()
+{
+	for(typename container_type::iterator it = factories_.begin(); it != factories_.end(); ++it)
+		delete *it;
+	factories_.clear();
+}
+
 /*template<class T>
 	template<class BufferType>
 ParticleBase3D<T> * ParticleFactory<T>::create(BufferType & buff, const ParticleShapeLibrary<T> & shape_library)

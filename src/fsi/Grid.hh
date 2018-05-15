@@ -15,7 +15,10 @@ namespace plb {
 namespace fsi {
 
 template<class T, class U>
-Grid<T, U>::Grid() : domain(0, 1, 0, 1, 0, 1), min_cell_size(1) { }
+Grid<T, U>::Grid() : domain(0, 1, 0, 1, 0, 1), min_cell_size(1) 
+{ 
+	repartition();
+}
 
 template<class T, class U>
 Grid<T, U>::Grid(const geo::Rect<T> domain_, T min_cell_size_)

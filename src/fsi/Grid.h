@@ -15,6 +15,7 @@ namespace fsi {
 
 template<class T, class U>
 struct Cell {
+	Cell() : nodes(), domain() { }
 	std::vector<U> nodes;
 	geo::Rect<T> domain;
 };

@@ -80,7 +80,7 @@ public:
 
 	// Fsi methods
 	void set_forces_to_zero();
-	void interpolate_velocity(const Box3D &, BlockLattice3D<T, Descriptor> &, TensorField3D<T, 3> &);
+	void interpolate_velocity(const Box3D &, TensorField3D<T, 3> &);
 	void compute_and_spread_forces(const Box3D &, BlockLattice3D<T, Descriptor> &);
 	void move_vertices_and_revoxelize(const Box3D &, BlockLattice3D<T, Descriptor> &);
 	void move_vertices();

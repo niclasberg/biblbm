@@ -168,6 +168,10 @@ public:
 	}
 
 private:
+	// Disable copy and assignment operators
+	DiracWithMissingPoints(const DiracWithMissingPoints &);
+	DiracWithMissingPoints & operator=(const DiracWithMissingPoints &);
+
 	Array<T, 3> _x0;
 	Dot3D _i0;
 	std::vector<DiracPoint> _dirac_points;

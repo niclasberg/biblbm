@@ -152,8 +152,8 @@ public:
 	template<class BufferType>
 	void unpack(BufferType & buf)
 	{
-		plint num_entries, iX, iY, size;
-		T entry;
+		plint num_entries = 0, iX = 0, iY = 0, size = 0;
+		T entry = T();
 		plint unpacked = 0;
 		utils::unpack(buf, num_entries);
 

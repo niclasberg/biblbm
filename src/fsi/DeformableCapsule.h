@@ -54,6 +54,8 @@ public:
 	virtual void unpack(char *&);
 	virtual void unpack(std::istream &);
 
+	virtual bool should_voxelize() const { return true; }
+
 	// Getters
 	CapsuleParameters<T> & params() { return params_; }
 	const CapsuleParameters<T> & params() const { return params_; }

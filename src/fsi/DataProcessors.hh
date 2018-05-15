@@ -102,7 +102,7 @@ void ImmersedBoundaryWrapperFunctional3D<T, Descriptor, Periodicity>::process(
 		exit(-1);
 	}
 
-	ibm.interpolate_velocity(domain, lattice, velocity);
+	ibm.interpolate_velocity(domain, velocity);
 	ibm.compute_and_spread_forces(domain, lattice);
 	ibm.move_vertices_and_revoxelize(domain, lattice);
 }
@@ -130,6 +130,21 @@ ImmersedBoundaryWrapperFunctional3D<T, Descriptor, Periodicity> *
 {
 	return new ImmersedBoundaryWrapperFunctional3D<T, Descriptor, Periodicity>(ibm);
 }
+
+template<class T, template<typename U> class Descriptor>
+void VelocityComputer3D<T, Descriptor>::process(Box3D domain, BlockLattice3D<T,Descriptor>& lattice, TensorField3D<T,3>& velocity)
+{
+	Dot3D offset = computeRelativeDisplacement(lattice, velocity);
+
+	for(plint i = domain.x0; i <= domain.x1; ++i)
+		for(plint j = domain.y0; j <= domain.y1; ++j)
+			for(plint k = domain.z0; k <= domain.z1; ++k) {
+				lattice.get(i, j, k).computeVelocity(
+						velocity.get(i+offset.x, j+offset.y, k+offset.z)
+				);
+			}
+}
+
 
 }
 

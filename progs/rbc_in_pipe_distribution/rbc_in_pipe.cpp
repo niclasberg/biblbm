@@ -352,10 +352,7 @@ void setup_flow(
 	fluidLattice->toggleInternalStatistics(false);
 
 	// Insert cylinder wall boundary condition
-	if(second_order_bcs) {
-		boundary_condition = new GuoRigidWallBoundary<T, DESCRIPTOR>(pipe_boundary, *fluidLattice);
-		boundary_condition->insert();
-	} else {
+	if( ! second_order_bcs) {
 		defineDynamics<T,DESCRIPTOR>(*fluidLattice,
 				fluidLattice->getBoundingBox(),
 				new BoundarySurface<T>(pipe_boundary),
@@ -370,28 +367,37 @@ void setup_flow(
 				new plb::NoDynamics<T,DESCRIPTOR>() );*/
 
 	// Read checkpoint file if requested
-	if(load_checkpoint)
+	if(load_checkpoint) {
 		parallelIO::load("checkpoint_lbm", *fluidLattice, false);
-	else {
+	} else {
 		setExternalVector(*fluidLattice,
 				fluidLattice->getBoundingBox(),
 				DESCRIPTOR<T>::ExternalField::forceBeginsAt,
 				external_force);
+		setExternalScalar(*fluidLattice,
+				fluidLattice->getBoundingBox(),
+				DESCRIPTOR<T>::ExternalField::phaseBeginsAt,
+				0.);
 
 		// Default-initialize at equilibrium with zero-velocity and fixed pressure.
 		initializeAtEquilibrium(*fluidLattice,
 				fluidLattice->getBoundingBox(),
 				PipeFlowDensityAndVelocity<double>(pipe_boundary, uMax));
 
-		// Export boundary geometry
-		pipe_boundary.writeVTK(global::directories().getOutputDir() + std::string("boundary.vtu"));
+		fluidLattice->initialize();
 
-		// Save checkpoint
-		parallelIO::save(*fluidLattice, "checkpoint_lbm", false);
+		pipe_boundary.writeVTK(global::directories().getOutputDir() + std::string("boundary.vtu"));
 	}
 
-	// Execute all data processors once to start the simulation off with well-defined initial values.
-	fluidLattice->initialize();
+	if(second_order_bcs) {
+		boundary_condition = new GuoRigidWallBoundary<T, DESCRIPTOR>(pipe_boundary, *fluidLattice);
+		boundary_condition->insert();
+
+		fluidLattice->executeInternalProcessors();
+	}
+
+	if(! load_checkpoint)
+		parallelIO::save(*fluidLattice, "checkpoint_lbm", false);
 }
 
 // Create an initial particle distribution by initializing the
@@ -492,112 +498,118 @@ void create_particles(
 			global::mpi().bCast(reinterpret_cast<T*>(&(orientations[0])), num_particles*4);
 
 			pcout << "Initial distribution created with " << num_particles << " particles at " << 100*initial_scale << "% of their full size" << std::endl;
-			pcout << "Growing particles to their full size" << std::endl;
 
-			// Create and insert particles to the fsi object
-			{
-				int N;
-				for(int i = 0, N = 0; i < particleTypes.size(); ++i)
-					for(plint j = 0; j < particleTypes[i].numParticles; ++j, ++N) {
-						RigidParticle3D<T> * p = rigidParticles[i];
-						p->scale() = initial_scale;
-						p->set_center_of_mass(positions[N]);
-						p->orientation() = orientations[N];
-						p->update();
-						fsi2.add_particle(p);
-					}
-			}
+			if(num_particles == 0) {
+				pcout << "No particles to add, skipping initialization step" << std::endl;
+			} else {
 
-			// Initialize fsi
-			fsi2.init();
+				pcout << "Growing particles to their full size" << std::endl;
 
-			// Potential force
-			SpringPotential<T> potential(1., 5e-2);
-
-			// Grow the particles while under the influence of collision forces
-			T scale;
-			for(plint it = 0; it <= Nit; ++it) {
-				if((it % 100) == 0)
-					pcout << "  Iteration " << it << " / " << Nit << std::endl;
-				//if((it % 500) == 0) fsi2.write_particles_as_vtk(it);
-
-				if((it % 10) == 0) {
-					// Rescale all particles
-					T fraction = (T)it / (T) Nit;
-					scale = initial_scale + (1. - initial_scale)*fraction;
-
-					for(typename ImmersedBoundaryDynamics3D<T, DESCRIPTOR, Periodicity>::ObjMapIterator iter = fsi2.particles_begin();
-							iter != fsi2.particles_end(); ++iter) {
-						plb::fsi::RigidParticle3D<T> * p = dynamic_cast<plb::fsi::RigidParticle3D<T> *>(iter->second);
-						if(p) {
-							p->scale() = scale;
+				// Create and insert particles to the fsi object
+				{
+					int N;
+					for(int i = 0, N = 0; i < particleTypes.size(); ++i)
+						for(plint j = 0; j < particleTypes[i].numParticles; ++j, ++N) {
+							RigidParticle3D<T> * p = rigidParticles[i];
+							p->scale() = initial_scale;
+							p->set_center_of_mass(positions[N]);
+							p->orientation() = orientations[N];
 							p->update();
+							fsi2.add_particle(p);
 						}
+				}
+
+				// Initialize fsi
+				fsi2.init();
+
+				// Potential force
+				SpringPotential<T> potential(1., 5e-2);
+
+				// Grow the particles while under the influence of collision forces
+				T scale;
+				for(plint it = 0; it <= Nit; ++it) {
+					if((it % 100) == 0)
+						pcout << "  Iteration " << it << " / " << Nit << std::endl;
+					//if((it % 500) == 0) fsi2.write_particles_as_vtk(it);
+
+					if((it % 10) == 0) {
+						// Rescale all particles
+						T fraction = (T)it / (T) Nit;
+						scale = initial_scale + (1. - initial_scale)*fraction;
+
+						for(typename ImmersedBoundaryDynamics3D<T, DESCRIPTOR, Periodicity>::ObjMapIterator iter = fsi2.particles_begin();
+								iter != fsi2.particles_end(); ++iter) {
+							plb::fsi::RigidParticle3D<T> * p = dynamic_cast<plb::fsi::RigidParticle3D<T> *>(iter->second);
+							if(p) {
+								p->scale() = scale;
+								p->update();
+							}
+						}
+
+						fsi2.synchronize_particle_states();
 					}
 
-					fsi2.synchronize_particle_states();
+					fsi2.compute_collision_forces(potential, &boundary2);
+					fsi2.move_vertices();
 				}
 
-				fsi2.compute_collision_forces(potential, &boundary2);
-				fsi2.move_vertices();
-			}
+				// Scatter all particle positions and orientations
+				CommunicationBuffer comm_buff;
+				std::vector<plint> proc_list;
+				for(plint i = 0; i < global::mpi().getSize(); ++i)
+					if(i != global::mpi().getRank())
+						proc_list.push_back(i);
+				comm_buff.set_proc_list(proc_list);
 
-			// Scatter all particle positions and orientations
-			CommunicationBuffer comm_buff;
-			std::vector<plint> proc_list;
-			for(plint i = 0; i < global::mpi().getSize(); ++i)
-				if(i != global::mpi().getRank())
-					proc_list.push_back(i);
-			comm_buff.set_proc_list(proc_list);
+				for(ImmersedBoundaryDynamics3D<double, DESCRIPTOR, Periodicity>::ObjMapIterator iter = fsi2.particles_begin();
+								iter != fsi2.particles_end(); ++iter) {
+					plb::fsi::RigidParticle3D<T> * p = dynamic_cast<plb::fsi::RigidParticle3D<T> *>(iter->second);
+					for(plint i = 0; i < proc_list.size(); ++i) {
+						comm_buff.pack<plint>(proc_list[i], p->get_id());
+						comm_buff.pack(proc_list[i], p->center_of_mass());
+						comm_buff.pack(proc_list[i], p->orientation());
+					}
 
-			for(ImmersedBoundaryDynamics3D<double, DESCRIPTOR, Periodicity>::ObjMapIterator iter = fsi2.particles_begin();
-							iter != fsi2.particles_end(); ++iter) {
-				plb::fsi::RigidParticle3D<T> * p = dynamic_cast<plb::fsi::RigidParticle3D<T> *>(iter->second);
-				for(plint i = 0; i < proc_list.size(); ++i) {
-					comm_buff.pack<plint>(proc_list[i], p->get_id());
-					comm_buff.pack(proc_list[i], p->center_of_mass());
-					comm_buff.pack(proc_list[i], p->orientation());
+					positions[p->get_id()] = p->center_of_mass();
+					orientations[p->get_id()] = p->orientation();
 				}
 
-				positions[p->get_id()] = p->center_of_mass();
-				orientations[p->get_id()] = p->orientation();
-			}
+				comm_buff.send_and_receive_no_wait(true);
+				comm_buff.finalize_send_and_receive();
 
-			comm_buff.send_and_receive_no_wait(true);
-			comm_buff.finalize_send_and_receive();
+				char * it = comm_buff.recv_buffer_begin();
+				while(it != comm_buff.recv_buffer_end()) {
+					plint id;
+					utils::unpack(it, id);
+					utils::unpack(it, positions[id]);
+					utils::unpack(it, orientations[id]);
+				}
 
-			char * it = comm_buff.recv_buffer_begin();
-			while(it != comm_buff.recv_buffer_end()) {
-				plint id;
-				utils::unpack(it, id);
-				utils::unpack(it, positions[id]);
-				utils::unpack(it, orientations[id]);
-			}
+				// Add particles to the immersed boundary object
+				{
+					int N;
+					for(int i = 0, N = 0; i < particleTypes.size(); ++i) {
+						for(int j = 0; j < particleTypes[i].numParticles; ++j, ++N) {
+							ParticleBase3D<T> * p = particleTypes[i].particle->clone();
+							DeformableParticle3D<T> * pd = dynamic_cast<DeformableParticle3D<T> *>(p);
+							RigidParticle3D<T> * pr = dynamic_cast<RigidParticle3D<T> *>(p);
+							if(pd) {
+								Transform<T> transform;
+								transform.translate(-pd->center_of_mass())
+										 .rotate(orientations[N])
+										 .translate(positions[N]);
+								pd->transform_vertices(transform);
+							} else if(pr) {
+								pr->orientation() = orientations[N];
+								pr->set_center_of_mass(positions[N]);
+							} else {
+								std::cerr << "An error occured during particle type casting" << std::endl;
+							}
+							p->update();
 
-			// Add particles to the immersed boundary object
-			{
-				int N;
-				for(int i = 0, N = 0; i < particleTypes.size(); ++i) {
-					for(int j = 0; j < particleTypes[i].numParticles; ++j, ++N) {
-						ParticleBase3D<T> * p = particleTypes[i].particle->clone();
-						DeformableParticle3D<T> * pd = dynamic_cast<DeformableParticle3D<T> *>(p);
-						RigidParticle3D<T> * pr = dynamic_cast<RigidParticle3D<T> *>(p);
-						if(pd) {
-							Transform<T> transform;
-							transform.translate(-pd->center_of_mass())
-									 .rotate(orientations[N])
-									 .translate(positions[N]);
-							pd->transform_vertices(transform);
-						} else if(pr) {
-							pr->orientation() = orientations[N];
-							pr->set_center_of_mass(positions[N]);
-						} else {
-							std::cerr << "An error occured during particle type casting" << std::endl;
+							fsi.add_particle(p);
+							delete p;
 						}
-						p->update();
-
-						fsi.add_particle(p);
-						delete p;
 					}
 				}
 			}
@@ -608,6 +620,7 @@ void create_particles(
 
 	for(int i = 0; i < particleTypes.size(); ++i)
 		delete particleTypes[i].particle;
+	particleTypes.clear();
 }
 
 Time create_time()
@@ -692,6 +705,14 @@ int main(int argc, char ** argv)
 	std::auto_ptr<MultiScalarField3D<double> > H = generateMultiScalarField<double>(domain, extendedEnvelopeWidth);
 	std::auto_ptr<MultiTensorField3D<double, 3> > forceField = generateMultiTensorField<double, 3>(domain, extendedEnvelopeWidth);
 
+	// Print out the lattice structure
+	{
+		std::auto_ptr<MultiScalarField3D<double> > ind = generateMultiScalarField<double>(domain, extendedEnvelopeWidth);
+		applyProcessingFunctional(new GuoRigidWallBoundaryDebugger<double, DESCRIPTOR>(*boundary_condition), domain, *ind);
+		VtkImageOutput3D<double> vtkOut(std::string("latticeStructure"), 1.);
+		vtkOut.writeData<float>(*ind, "boundaryNodes", 1.);
+	}
+
 	pcout << "===============" << std::endl;
 	pcout << "Starting coupled ib-lbm iterations" << std::endl;
 
@@ -709,6 +730,8 @@ int main(int argc, char ** argv)
 		if(it.is_multiple_of(checkpoint_interval) && !first_iteration)
 			write_checkpoint(it, fsi, *lattice);
 
+		// Compute velocity
+		//applyProcessingFunctional(new VelocityComputer3D<double, DESCRIPTOR>(), domain, *lattice, *velocity);
 		computeVelocity(*lattice, *velocity, domain);
 
 		if(it.is_multiple_of(particle_lw_interval)) {
@@ -738,20 +761,21 @@ int main(int argc, char ** argv)
 		setExternalVector(*lattice, domain, DESCRIPTOR<double>::ExternalField::forceBeginsAt, external_force);
 		applyProcessingFunctional(wrap_ibm_dynamics3D(fsi), domain, *lattice, *velocity);
 
-		// Do lattice boltzmann step
+		// Do Lattice Boltzmann step
 		Profile::start_timer("lbm");
 		lattice->collideAndStream();
 		Profile::stop_timer("lbm");
 
 		// Just a flag
 		first_iteration = false;
+		//break;
 	}
 
 	Profile::write_report("profile");
 
-	//parallelIO::save(*lattice, "checkpoint_lbm", false);
-	//fsi.save_checkpoint("checkpoint_fsi");
-	//it.write_checkpoint("checkpoint_time");
+	parallelIO::save(*lattice, "checkpoint_lbm", false);
+	fsi.save_checkpoint("checkpoint_fsi");
+	it.write_checkpoint("checkpoint_time");
 
 	// Free memory
 	delete lattice;
@@ -761,5 +785,7 @@ int main(int argc, char ** argv)
 		delete wall_interaction;
 	if(pp_interaction)
 		delete pp_interaction;
+	for(plint i = 0; i < particleTypes.size(); ++i)
+		delete particleTypes[i].particle;
 }
 

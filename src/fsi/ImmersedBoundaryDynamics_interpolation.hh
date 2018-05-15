@@ -58,17 +58,20 @@ struct GeneralInterpolator {
 			plint i2 = arithmetic.remap_index_x(i, offset.x);
 			if(i2 < dom.x0 || i2 > dom.x1) continue;
 
-			T dirac_x = sampled_dirac.eval((T)i - pos_rel[0]);
+			//T dirac_x = sampled_dirac.eval((T)i - pos_rel[0]);
+			const T dirac_x = Dirac::eval((T)i - pos_rel[0]);
 			for(plint j = d_bounds.y0; j <= d_bounds.y1; ++j) {
 				plint j2 = arithmetic.remap_index_y(j, offset.y);
 				if(j2 < dom.y0 || j2 > dom.y1) continue;
 
-				T dirac_xy = dirac_x * sampled_dirac.eval((T)j - pos_rel[1]);
+				const T dirac_xy = dirac_x * Dirac::eval((T)j - pos_rel[1]);
+				//T dirac_xy = dirac_x * sampled_dirac.eval((T)j - pos_rel[1]);
 				for(plint k = d_bounds.z0; k <= d_bounds.z1; ++k) {
 					plint k2 = arithmetic.remap_index_z(k, offset.z);
 					if(k2 < dom.z0 || k2 > dom.z1) continue;
 
-					T dirac_xyz = dirac_xy * sampled_dirac.eval((T)k - pos_rel[2]);
+					//T dirac_xyz = dirac_xy * sampled_dirac.eval((T)k - pos_rel[2]);
+					const T dirac_xyz = dirac_xy * Dirac::eval((T)k - pos_rel[2]);
 					node.vel += (dirac_xyz * velocity.get(i2, j2, k2));
 				}
 			}
@@ -93,11 +96,14 @@ struct BulkInterpolator {
 			const Array<T, 3> & pos_rel)
 	{
 		for(plint i = d_bounds.x0; i <= d_bounds.x1; ++i) {
-			T dirac_x = sampled_dirac.eval((T)i - pos_rel[0]);
+			const T dirac_x = Dirac::eval((T)i - pos_rel[0]);
+			//T dirac_x = sampled_dirac.eval((T)i - pos_rel[0]);
 			for(plint j = d_bounds.y0; j <= d_bounds.y1; ++j) {
-				T dirac_xy = dirac_x * sampled_dirac.eval((T)j - pos_rel[1]);
+				const T dirac_xy = dirac_x * Dirac::eval((T)j - pos_rel[1]);
+				//T dirac_xy = dirac_x * sampled_dirac.eval((T)j - pos_rel[1]);
 				for(plint k = d_bounds.z0; k <= d_bounds.z1; ++k) {
-					T dirac_xyz = dirac_xy * sampled_dirac.eval((T)k - pos_rel[2]);
+					const T dirac_xyz = dirac_xy * Dirac::eval((T)k - pos_rel[2]);
+					//T dirac_xyz = dirac_xy * sampled_dirac.eval((T)k - pos_rel[2]);
 					node.vel += (dirac_xyz * velocity.get(i, j, k));
 				}
 			}
@@ -120,7 +126,16 @@ struct BulkInterpolator<T, RomaDirac<T, 3> > {
 			const Array<T, 3> & pos_rel)
 	{
 		// Evaluate dirac values
-		const T dx0 = sampled_dirac.eval((T)d_bounds.x0 - pos_rel[0]);
+		const T dx0 = RomaDirac<T, 3>::eval((T)d_bounds.x0 - pos_rel[0]);
+		const T dx1 = RomaDirac<T, 3>::eval((T)d_bounds.x0 + (T)1. - pos_rel[0]);
+		const T dx2 = RomaDirac<T, 3>::eval((T)d_bounds.x1 - pos_rel[0]);
+		const T dy0 = RomaDirac<T, 3>::eval((T)d_bounds.y0 - pos_rel[1]);
+		const T dy1 = RomaDirac<T, 3>::eval((T)d_bounds.y0 + (T)1. - pos_rel[1]);
+		const T dy2 = RomaDirac<T, 3>::eval((T)d_bounds.y1 - pos_rel[1]);
+		const T dz0 = RomaDirac<T, 3>::eval((T)d_bounds.z0 - pos_rel[2]);
+		const T dz1 = RomaDirac<T, 3>::eval((T)d_bounds.z0 + (T)1. - pos_rel[2]);
+		const T dz2 = RomaDirac<T, 3>::eval((T)d_bounds.z1 - pos_rel[2]);
+		/*const T dx0 = sampled_dirac.eval((T)d_bounds.x0 - pos_rel[0]);
 		const T dx1 = sampled_dirac.eval((T)d_bounds.x0 + (T)1. - pos_rel[0]);
 		const T dx2 = sampled_dirac.eval((T)d_bounds.x1 - pos_rel[0]);
 		const T dy0 = sampled_dirac.eval((T)d_bounds.y0 - pos_rel[1]);
@@ -128,7 +143,7 @@ struct BulkInterpolator<T, RomaDirac<T, 3> > {
 		const T dy2 = sampled_dirac.eval((T)d_bounds.y1 - pos_rel[1]);
 		const T dz0 = sampled_dirac.eval((T)d_bounds.z0 - pos_rel[2]);
 		const T dz1 = sampled_dirac.eval((T)d_bounds.z0 + (T)1. - pos_rel[2]);
-		const T dz2 = sampled_dirac.eval((T)d_bounds.z1 - pos_rel[2]);
+		const T dz2 = sampled_dirac.eval((T)d_bounds.z1 - pos_rel[2]);*/
 
 		// Get indices
 		// It will henceforth be assumed that d_bounds does not cross over a periodic edge,
@@ -136,10 +151,6 @@ struct BulkInterpolator<T, RomaDirac<T, 3> > {
 		plint i0 = arithmetic.remap_index_x(d_bounds.x0, offset.x);
 		plint j0 = arithmetic.remap_index_y(d_bounds.y0, offset.y);
 		plint k0 = arithmetic.remap_index_z(d_bounds.z0, offset.z);;
-
-		/*std::cout << i0 << " (" << dom.x0 << ", " << dom.x1 << "), "
-				<< j0 << " (" << dom.y0 << ", " << dom.y1 << "), "
-				<< k0 << " (" << dom.z0 << ", " << dom.z1 << ")" << std::endl;*/
 
 		// Compute the interpolated value
 		node.vel = dx0*(dy0*(dz0 * velocity.get(i0,   j0,   k0) + dz1 * velocity.get(i0,   j0,   k0+1) + dz2 * velocity.get(i0,   j0,   k0+2)) +
@@ -186,16 +197,12 @@ template<class T, template<typename U> class Descriptor, class Arithmetic, class
 void interpolate_near_boundary(
 		const Box3D & dom,
 		TensorField3D<T, 3> & velocity,
-		BlockLattice3D<T, Descriptor> & lattice,
 		std::vector<NodeType> & node_container,
 		const Arithmetic & arithmetic,
 		Boundary<T> * boundary)
 {
 	Dot3D offset = velocity.getLocation();
-	Dot3D latticeOffset = lattice.getLocation();
-
 	Box3D d_bounds;
-	NoDynamics<T,Descriptor> noDynamics(1.);
 
 	for(plint it = 0; it < node_container.size(); ++it) {
 		// Dereference NodeType as a reference (it can be either a pointer or a reference)
@@ -251,7 +258,6 @@ void interpolate_near_boundary(
 template<class T, template<typename U> class Descriptor, class Periodicity>
 void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::interpolate_velocity(
 	const Box3D & dom,
-	BlockLattice3D<T, Descriptor> & lattice,
 	TensorField3D<T, 3> & velocity)
 {
 	Profile::start_timer("interpolate");
@@ -260,7 +266,14 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::interpolate_velocit
 	interpolation::interpolate_bulk(dom, velocity, nonlocal_nodes, arithmetic, sampled_dirac);
 	interpolation::interpolate(dom, velocity, nonlocal_nodes_envelope, arithmetic, sampled_dirac);
 	interpolation::interpolate_near_boundary<T, Descriptor, ArithmeticType, NonLocalNode<T>, Dirac>(dom, velocity,
-			lattice, nonlocal_nodes_boundary, arithmetic, boundary);
+			nonlocal_nodes_boundary, arithmetic, boundary);
+
+	for(plint i = dom.x0; i <= dom.x1; ++i)
+		for(plint j = dom.y0; j <= dom.y1; ++j)
+			for(plint k = dom.z0; k <= dom.z1; ++k) {
+				if(velocity.get(i, j, k)[0] < -1000)
+					std::cout << "ASDFASDF";
+			}
 
 	// Send to appropriate processors
 	send_interpolation_data();
@@ -274,7 +287,7 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::interpolate_velocit
 	interpolation::interpolate_bulk(dom, velocity, local_nodes, arithmetic, sampled_dirac);
 	interpolation::interpolate(dom, velocity, local_nodes_envelope, arithmetic, sampled_dirac);
 	interpolation::interpolate_near_boundary<T, Descriptor, ArithmeticType, Vertex<T> *, Dirac>(dom, velocity,
-			lattice, local_nodes_boundary, arithmetic, boundary);
+			local_nodes_boundary, arithmetic, boundary);
 	Profile::stop_timer("interpolate");
 
 	// Receive and reduce velocity

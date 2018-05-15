@@ -82,9 +82,10 @@ void GuoRigidWallBoundaryInstantiator<T, Descriptor>::process(Box3D domain, Bloc
 					// Check if any lattice vector crosses the surface of the boundary
 					// if so, pick the direction of the crossing that best aligns with the normal of the surface.
 					T cos_angle_min = 2;
-					Dot3D dir_min;
-					T delta_min;
+					Dot3D dir_min(0, 0, 0);
+					T delta_min = -1;
 					Array<T, 3> wall_pos_min;
+					wall_pos_min.resetToZero();
 					bool success = false;
 
 					for(plint iDir = 1; iDir < Descriptor<T>::q; ++iDir) {
@@ -93,7 +94,7 @@ void GuoRigidWallBoundaryInstantiator<T, Descriptor>::process(Box3D domain, Bloc
 						Array<T, 3> dir2(dir.x, dir.y, dir.z);
 
 						// Check if neighbour is a fluid node
-						T t;
+						T t = -1;
 						if(model_.boundary().trace_ray(pos, pos+dir2, t)) {
 							//Normalized lattice vector
 							dir2 /= dir_norms[iDir];
@@ -143,7 +144,6 @@ void GuoRigidWallBoundaryFunctional<T, Descriptor>::process(Box3D domain, BlockL
 	Array<T, Descriptor<T>::q> fNeq2;
 	Array<T, Descriptor<T>::q> fNeq_w;
 	plint depth = 2;
-	Array<T, 3> wall_vel;
 
 	for(typename GuoRigidWallBoundary<T, Descriptor>::iterator it = model_.begin(); it != model_.end(); ++it) {
 		Dot3D pos_rel(it->location.x - offset.x, it->location.y - offset.y, it->location.z - offset.z);
@@ -172,7 +172,7 @@ void GuoRigidWallBoundaryFunctional<T, Descriptor>::process(Box3D domain, BlockL
 
 		// Extrapolate wall momentum flux and non-equilibrium part of the distribution
 		rhoBar_w = rhoBar1;
-		Array<T,3> wall_j = Descriptor<T>::fullRho(rhoBar_w)*wall_vel;
+		Array<T,3> wall_j = Descriptor<T>::fullRho(rhoBar_w) * it->velocity;
 		if (depth < 2) {
 			j_w = (it->delta < (T)0.25) ? wall_j : (T)1./it->delta * (wall_j+(it->delta-(T)1.)*j1);
 			fNeq_w = fNeq1;
@@ -191,6 +191,29 @@ void GuoRigidWallBoundaryFunctional<T, Descriptor>::process(Box3D domain, BlockL
 			cell[iPop] = cell.computeEquilibrium(iPop, rhoBar_w, j_w, jSqr_w)+fNeq_w[iPop];
 		}
 
+	}
+}
+
+
+template<class T, template<typename U> class Descriptor>
+void GuoRigidWallBoundaryDebugger<T, Descriptor>::process(Box3D domain, ScalarField3D<T> & field)
+{
+	Dot3D offset = field.getLocation();
+	for(plint iX = domain.x0; iX <= domain.x1; ++iX)
+		for(plint iY = domain.y0; iY <= domain.y1; ++iY)
+			for(plint iZ = domain.z0; iZ <= domain.z1; ++iZ)
+				field.get(iX, iY, iZ) = 0;
+
+	for(typename GuoRigidWallBoundary<T, Descriptor>::iterator it = model_.begin(); it != model_.end(); ++it) {
+		Dot3D pos_rel(it->location.x - offset.x, it->location.y - offset.y, it->location.z - offset.z);
+
+		field.get(pos_rel.x, pos_rel.y, pos_rel.z) = 1.;
+		/*const plb::Cell<T, Descriptor> & cell1 = lattice.get(pos_rel.x + it->direction.x,
+															 pos_rel.y + it->direction.y,
+															 pos_rel.z + it->direction.z);
+		const plb::Cell<T, Descriptor> & cell2 = lattice.get(pos_rel.x + 2*it->direction.x,
+															 pos_rel.y + 2*it->direction.y,
+															 pos_rel.z + 2*it->direction.z);*/
 	}
 }
 

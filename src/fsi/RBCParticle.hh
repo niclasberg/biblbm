@@ -193,8 +193,9 @@ void RBCParticle<T>::compute_forces()
 
 	// Contribution from triangle level forces
 	Array<T, 3> grad_v0_A, grad_v1_A, grad_v2_A;
-	T local_area;
-	T max_df_area = 0, max_df_vol = 0;
+	T local_area = T();
+	T max_df_area = T();
+	T max_df_vol = T();
 	for(triangle_iterator it = this->shape()->triangles_begin();
 			it != this->shape()->triangles_end(); ++it) {
 		Vertex<T> & v0 = this->get_node(it->i0);
@@ -243,7 +244,7 @@ void RBCParticle<T>::compute_forces()
 	//std::cout << "Link: " << max_df_link << ", Area: " << max_df_area << ", Volume: " << max_df_vol << std::endl;
 
 	// Bending forces
-	T cos_theta, sin_theta;
+	T cos_theta = T(), sin_theta = T();
 	T cos_theta0 = params().cos_theta0(), sin_theta0 = params().sin_theta0();
 	//Array<Array<T, 3>, 4> grad_cos_theta, grad_sin_theta;
 	Array<Array<T, 3>, 4> grad_theta;
