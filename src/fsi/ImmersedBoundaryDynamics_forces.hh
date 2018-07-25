@@ -362,6 +362,7 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::compute_particle_pa
 	// Add non-local nodes
 	detail::add_nonlocal_nodes_to_collision_handler(nonlocal_nodes, collision_handler);
 	detail::add_nonlocal_nodes_to_collision_handler(nonlocal_nodes_envelope, collision_handler);
+	detail::add_nonlocal_nodes_to_collision_handler(nonlocal_nodes_boundary, collision_handler);
 
 	// Add local nodes
 	for(ObjMapIterator it = particles.begin(); it != particles.end(); ++it) {
