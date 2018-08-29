@@ -102,6 +102,23 @@ inline void triangle_area_and_gradient(const Array<T, 3> & v0, const Array<T, 3>
 	g2[2] = (a * (v1[1] - v0[1]) + b * v00v10                      ) * denom;
 }
 
+template<class T>
+inline T signed_volume(const Array<T, 3> & v0, const Array<T, 3> & v1, const Array<T, 3> & v2)
+{
+	// Compute the signed volume of the tetrahedron spanned by the origin, v0, v1, and v2
+	return dot(v0, crossProduct(v1, v2)) / 6.;
+}
+
+template<class T>
+inline void grad_signed_volume(const Array<T, 3> & v0, const Array<T, 3> & v1, const Array<T, 3> & v2,
+	Array<T, 3> & grad_v0, Array<T, 3> & grad_v1, Array<T, 3> & grad_v2)
+{
+	// Use that v0.(v1 x v2) = v2.(v0 x v1) = v1 . (v2 x v0)
+	grad_v0 = crossProduct(v1, v2) / 6.;
+	grad_v1 = crossProduct(v2, v0) / 6.;
+	grad_v2 = crossProduct(v0, v1) / 6.;
+}
+
 // Sine and cosine of the angle between the normals of the two triangles
 // spanned by (v0, v1, v2) and (v0, v2, v3)
 template<class T>
@@ -331,7 +348,6 @@ void grad_bending_strain_tensor(const Array<Array<T, 3>, 6> & v, Array<Array<T, 
 	K22[4].resetToZero();
 	K22[5] = tmp / tmp_norm;
 }
-
 
 } /* namespace tri */
 

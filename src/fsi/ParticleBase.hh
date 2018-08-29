@@ -24,7 +24,8 @@ ParticleBase3D<T>::ParticleBase3D(
   id(-1),
   area_(shape->get_area()),
   volume_(shape->get_volume()),
-  center_of_mass_(shape->get_center())
+  center_of_mass_(shape->get_center()),
+  should_voxelize_(true)
 {
 	// Create vertices
 	vertices.resize(this->shape()->count_vertices());
@@ -75,7 +76,8 @@ ParticleBase3D<T>::ParticleBase3D(const ParticleBase3D & rhs)
   //voxelizer_(shape_->triangles(), vertices),
   area_(rhs.area_),
   volume_(rhs.volume_),
-  center_of_mass_(rhs.center_of_mass_)
+  center_of_mass_(rhs.center_of_mass_),
+  should_voxelize_(rhs.should_voxelize_)
 {
 	update();
 }
@@ -90,6 +92,7 @@ ParticleBase3D<T> & ParticleBase3D<T>::operator=(const ParticleBase3D & rhs)
 		area_ = rhs.area_;
 		volume_ = rhs.volume_;
 		center_of_mass_ = rhs.center_of_mass_;
+		should_voxelize_ = rhs.should_voxelize_;
 		update();
 	}
 	return *this;
@@ -217,6 +220,7 @@ void ParticleBase3D<T>::pack(std::vector<char> & buff) const
 	utils::pack(buff, this->get_type_id());
 	utils::pack(buff, this->shape()->get_id());
 	utils::pack(buff, this->get_id());
+	utils::pack(buff, this->should_voxelize());
 }
 
 template<class T>
@@ -232,6 +236,7 @@ void ParticleBase3D<T>::unpack(char *& buff)
 {
 	plint id;
 	utils::unpack(buff, id);
+	utils::unpack(buff, should_voxelize_);
 	this->set_id(id);
 }
 
@@ -240,6 +245,7 @@ void ParticleBase3D<T>::unpack(std::istream & in)
 {
 	plint id;
 	utils::unpack(in, id);
+	utils::unpack(in, should_voxelize_);
 	this->set_id(id);
 }
 

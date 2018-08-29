@@ -1,10 +1,3 @@
-/*
- * RBCParticle.hh
- *
- *  Created on: Jun 2, 2015
- *      Author: niber
- */
-
 #ifndef RBCPARTICLE_HH_
 #define RBCPARTICLE_HH_
 #include "RBCParticle.h"
@@ -31,7 +24,7 @@ inline T RBCParameters<T>::lmax(const T & l0) const
 }
 
 template<class T>
-void RBCParameters<T>::in_plane_ks_kp(T l0, T & ks, T & kp) const
+void RBCParameters<T>::in_plane_ks_kp(T l0, T m, T & ks, T & kp) const
 {
 	// The relations for ks and kp are: (c.f. Fedosov 2010)
 	// The energy should be minimal at the equilibrium length:
@@ -39,7 +32,6 @@ void RBCParameters<T>::in_plane_ks_kp(T l0, T & ks, T & kp) const
 	// Shear modulus:
 	//		4*l0 * G / sqrt(3) =  ks * ( x0/(2*(1-x0)^3) - 1/(4*(1-x0)^2) + 1/4) + kp * (m+1)/ l0^m
 
-	static T m = 2;
 	static T ks_coeff1 = 0.25 * (6.*x0 + (3*x0*x0 - 2*x0*x0*x0)/((1-x0)*(1-x0)));
 	static T ks_coeff2 = x0 / (2.*(1-x0)*(1-x0)*(1-x0)) + 0.25 * (1. - 1. / ((1-x0)*(1-x0)));
 
@@ -150,30 +142,15 @@ void RBCParticle<T>::compute_forces()
 	typedef typename ParticleShape<T>::link_const_iterator link_iterator;
 	typedef typename ParticleShape<T>::triangle_const_iterator triangle_iterator;
 	typedef typename ParticleShape<T>::triangle_pair_const_iterator triangle_pair_iterator;
+	static const T m = 2;
 
 	// Contribution from link related forces
 	T max_df_link = 0;
 	{
-		// The relations for ks and kp are: (c.f. Fedosov 2010)
-		// The energy should be minimal at the equilibrium length:
-		//		0 = ks / 4 * (6x + (3x^2 - 2x^3)/(1-x)^2) - kp / l0^m
-		// Shear modulus:
-		//		4*l0 * G / sqrt(3) =  ks * ( x0/(2*(1-x0)^3) - 1/(4*(1-x0)^2) + 1/4) + kp * (m+1)/ l0^m	
-		const T x0 = 1. / 2.2;
-		const T m = 2;
-		const T ks_coeff1 = 0.25 * (6.*x0 + (3*x0*x0 - 2*x0*x0*x0)/((1-x0)*(1-x0)));
-		const T ks_coeff2 = x0 / (2.*(1-x0)*(1-x0)*(1-x0)) + 0.25 * (1. - 1. / ((1-x0)*(1-x0)));
-
-		for(link_iterator it = this->shape()->links_begin();
-				it != this->shape()->links_end(); ++it) {
-
+		for(link_iterator it = this->shape()->links_begin(); it != this->shape()->links_end(); ++it) {
 			// Compute spring properties
-			const T kp_coeff1 = -1. / std::pow(it->length, m);
-			const T kp_coeff2 = (m+1) / std::pow(it->length, m);
-			const T G_lhs = (T)4. * it->length * params().shear_modulus / std::sqrt(3);	
-
-			T ks = -kp_coeff1*G_lhs / (ks_coeff1*kp_coeff2 - ks_coeff2*kp_coeff1);
-			T kp =  ks_coeff1*G_lhs / (ks_coeff1*kp_coeff2 - ks_coeff2*kp_coeff1);
+			T ks, kp;
+			params().in_plane_ks_kp(it->length, m, ks, kp);
 
 			// Compute node distance
 			Vertex<T> & v0 = this->get_node(it->i0);
@@ -181,7 +158,7 @@ void RBCParticle<T>::compute_forces()
 
 			const Array<T, 3> dv = v0.pos - v1.pos;
 			const T L = norm(dv);
-			const T x = L / (2.2*it->length);
+			const T x = L / params().lmax(it->length);
 
 			// Compute forces
 			const T df = -0.25*ks*(6.*x + (3.*x*x - 2.*x*x*x)/((1-x)*(1-x)) ) + kp / std::pow(L, m);
@@ -192,20 +169,19 @@ void RBCParticle<T>::compute_forces()
 	}
 
 	// Contribution from triangle level forces
-	Array<T, 3> grad_v0_A, grad_v1_A, grad_v2_A;
 	T local_area = T();
 	T max_df_area = T();
 	T max_df_vol = T();
-	for(triangle_iterator it = this->shape()->triangles_begin();
-			it != this->shape()->triangles_end(); ++it) {
+	for(triangle_iterator it = this->shape()->triangles_begin(); it != this->shape()->triangles_end(); ++it) {
 		Vertex<T> & v0 = this->get_node(it->i0);
 		Vertex<T> & v1 = this->get_node(it->i1);
 		Vertex<T> & v2 = this->get_node(it->i2);
 
-		const Array<T, 3> & p0 = v0.pos, & p1 = v1.pos, & p2 = v2.pos;
+		// Storage for gradients
+		Array<T, 3> grad_v0, grad_v1, grad_v2;
 
 		// Element area and area gradient
-		tri::triangle_area_and_gradient(v0.pos, v1.pos, v2.pos, local_area, grad_v0_A, grad_v1_A, grad_v2_A);
+		tri::triangle_area_and_gradient(v0.pos, v1.pos, v2.pos, local_area, grad_v0, grad_v1, grad_v2);
 		T df_area = 0.;
 
 		// In-plane area compression contribution
@@ -220,22 +196,17 @@ void RBCParticle<T>::compute_forces()
 		df_area += params().k_area_local * (it->area - local_area) / it->area;
 
 		// Find the nodal forces (chain-rule differentiation of the area terms)
-		v0.force += df_area * grad_v0_A;
-		v1.force += df_area * grad_v1_A;
-		v2.force += df_area * grad_v2_A;
+		v0.force += df_area * grad_v0;
+		v1.force += df_area * grad_v1;
+		v2.force += df_area * grad_v2;
 
 		// Volume constraint
+		tri::grad_signed_volume(v0.pos, v1.pos, v2.pos, grad_v0, grad_v1, grad_v2);
+
 		T df_vol = params().k_volume * (params().vol_desired - this->volume()) / params().vol_desired;
-		df_vol /= 6;
-		v0.force[0] += df_vol*( p1[1]*p2[2] - p1[2]*p2[1]);
-		v0.force[1] += df_vol*(-p1[0]*p2[2] + p1[2]*p2[0]);
-		v0.force[2] += df_vol*( p1[0]*p2[1] - p1[1]*p2[0]);
-		v1.force[0] += df_vol*(-p0[1]*p2[2] + p0[2]*p2[1]);
-		v1.force[1] += df_vol*( p0[0]*p2[2] - p0[2]*p2[0]);
-		v1.force[2] += df_vol*(-p0[0]*p2[1] + p0[1]*p2[0]);
-		v2.force[0] += df_vol*( p0[1]*p1[2] - p0[2]*p1[1]);
-		v2.force[1] += df_vol*(-p0[0]*p1[2] + p0[2]*p1[0]);
-		v2.force[2] += df_vol*( p0[0]*p1[1] - p0[1]*p1[0]);
+		v0.force += df_vol * grad_v0;
+		v1.force += df_vol * grad_v1;
+		v2.force += df_vol * grad_v2;
 
 		max_df_area = std::max(std::abs(df_area), max_df_area);
 		max_df_vol = std::max(std::abs(df_vol), max_df_vol);
@@ -263,10 +234,11 @@ void RBCParticle<T>::compute_forces()
 				cos_theta, sin_theta,
 				grad_theta[0], grad_theta[1], grad_theta[2], grad_theta[3]);
 
-		// The potential is U = kb(1 - cos(theta-theta0)) = kb*(1 - cos(theta)cos(theta0) + sin(theta)sin(theta0))
-		// Hence, the force is F = -grad(U) = kb(cos(theta0)grad(cos(theta)) - sin(theta0)grad(sin(theta))) or
-		// F = -kb(cos(theta0)sin(theta) + sin(theta0)cos(theta))grad(theta)
-		T prefactor = -params().k_bend * (cos_theta0 * sin_theta + sin_theta0 * cos_theta);
+		// The potential is U = kb(1 - cos(theta-theta0)) = kb*(1 - cos(theta)cos(theta0) - sin(theta)sin(theta0))
+		// Hence, the force is F = -grad(U) = kb(cos(theta0)grad(cos(theta)) + sin(theta0)grad(sin(theta))) or
+		// F = kb(-cos(theta0)sin(theta) + sin(theta0)cos(theta))grad(theta)
+		//T prefactor = -params().k_bend * (cos_theta0 * sin_theta + sin_theta0 * cos_theta);
+		T prefactor = params().k_bend * (-it->cos_theta0 * sin_theta + it->sin_theta0 * cos_theta);
 		v0.force += prefactor * grad_theta[0];
 		v1.force += prefactor * grad_theta[1];
 		v2.force += prefactor * grad_theta[2];
@@ -281,6 +253,7 @@ void RBCParticle<T>::print_energies(Stream & out) const
 	typedef typename ParticleShape<T>::link_const_iterator link_iterator;
 	typedef typename ParticleShape<T>::triangle_const_iterator triangle_iterator;
 	typedef typename ParticleShape<T>::triangle_pair_const_iterator triangle_pair_iterator;
+	static const T m = 2;
 
 	T E_in_plane = 0, E_bend = 0, E_vol = 0, E_area = 0;
 
@@ -290,16 +263,16 @@ void RBCParticle<T>::print_energies(Stream & out) const
 		const Vertex<T> & v0 = this->get_node(it->i0);
 		const Vertex<T> & v1 = this->get_node(it->i1);
 
-		const Array<T, 3> dv = v0.pos - v1.pos;
-		const T L = norm(dv);
-		const T x0 = 1 / 2.2;
-		const T Lmax = it->length / x0;
+		const T L = norm(v0.pos - v1.pos);
+		const T Lmax = params().lmax(it->length);
 		const T xi = L / Lmax;
+		const T x0 = it->length / Lmax;
 
 		T ks, kp;
-		params().in_plane_ks_kp(it->length, ks, kp);
+		params().in_plane_ks_kp(it->length, m, ks, kp);
 
-		E_in_plane += ks*Lmax*(3*xi*xi - 2*xi*xi*xi) / (4.*(1 - xi)) + kp / L;
+		// Evaluate energy (reference level set to zero at equilibrium)
+		E_in_plane += ks*Lmax*((3*xi*xi - 2*xi*xi*xi) / (4.*(1 - xi)) - (3*x0*x0 - 2*x0*x0*x0) / (4.*(1 - x0))) + kp * (1. / ((m-1.) * std::pow(L, m-1)) - 1. / ((m-1.) * std::pow(it->length, m-1)));
 	}
 
 	// Contribution from triangle level forces
@@ -326,15 +299,15 @@ void RBCParticle<T>::print_energies(Stream & out) const
 	T cos_theta0 = params().cos_theta0(), sin_theta0 = params().sin_theta0();
 	for(triangle_pair_iterator it = this->shape()->triangle_pairs_begin();
 			it != this->shape()->triangle_pairs_end(); ++it) {
-
+	
 		tri::cos_sin_of_angle_between_pair(
 				this->get_node(it->i0).pos,
 				this->get_node(it->i1).pos,
 				this->get_node(it->i2).pos,
 				this->get_node(it->i3).pos,
 				cos_theta, sin_theta);
-
-		E_bend += params().k_bend * (1 - (cos_theta*cos_theta0 - sin_theta*sin_theta0));
+		//E_bend += params().k_bend * (1 - cos_theta*cos_theta0 - sin_theta*sin_theta0);
+		E_bend += params().k_bend * (1 - cos_theta*it->cos_theta0 - sin_theta*it->sin_theta0);
 	}
 
 	out << "In plane: " << E_in_plane << ", Bending: " << E_bend << ", Volume constraint: " << E_vol << ", Area constraint: " << E_area << std::endl;

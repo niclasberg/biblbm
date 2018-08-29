@@ -6,7 +6,6 @@
 #include "fsi/headers.hh"
 #include "../common/calibrate_rbc_shape.h"
 #include "../common/util.h"
-#include "../common/rbc_parameters.h"
 #include "fsi/Time.h"
 #include "fsi/GuoBoundaryCondition.h"
 #include "fsi/GuoBoundaryCondition.hh"
@@ -203,7 +202,7 @@ bool read_parameters(ParticleShapeLibrary<double> & shape_library, std::string f
 					wall_interaction =  new WallInteraction<double, SpringPotential<double> >(
 							pipe_boundary,
 							create_spring_potential<double>(xmlFile["particles"]["wall_interaction"]));
-				} else if(subType.compare("none") != 0) {
+				} else if(subType.compare("none") == 0) {
 
 				} else {
 					std::cerr << "Unknown wall interaction type " << subType << std::endl;
@@ -215,7 +214,7 @@ bool read_parameters(ParticleShapeLibrary<double> & shape_library, std::string f
 				} else if(subType.compare("spring") == 0) {
 					pp_interaction =  new PPPotentialForce<double, SpringPotential<double> >(
 							create_spring_potential<double>(xmlFile["particles"]["particle_interaction"]));
-				} else if(subType.compare("none") != 0) {
+				} else if(subType.compare("none") == 0) {
 
 				} else {
 					std::cerr << "Unknown particle interaction type " << subType << std::endl;
@@ -259,17 +258,35 @@ bool read_parameters(ParticleShapeLibrary<double> & shape_library, std::string f
 						double G_lb = a_lb * gamma_lb * nu_lb / Ca;
 						double K_area = (poisson_ratio + 1)/(1 - poisson_ratio) * G_lb;
 						double K_bend = k_bend_rel * G_lb * shape->get_area();
-						RBCParameters<double> rbc_params = create_rbc_params(shape, G_lb, K_area, K_bend);
 
-						// Create particle
-						RBCParticle<double> * rbc = new RBCParticle<double>(shape, rbc_params);
+						// Create particle initializer
+						RBCShapeInitializer<double> rbc_initializer(new RBCParticle<double>(shape));
 
 						// Create equilbrium shape
-						shrink_rbc_volume(*rbc, (double) deflationFactor*shape->get_volume(), 50000, 0.05, 1e-2);
-						rbc->set_minor_axis_orientation(Array<double, 3>(0, 0, 1));
-						rbc->set_center_of_mass(Array<double, 3>(0, 0, 0));
+						rbc_initializer.compute_rbc_parameters(G_lb, K_area, K_bend);
+						rbc_initializer.shrink_volume(deflationFactor, 40000);
 
-						particleTmp.particle = rbc;
+						// Store particle
+						particleTmp.particle = rbc_initializer.get_rbc().clone();
+
+					} else if(subType.compare("platelet") == 0) {
+						// Read properties
+						double k_bend_rel;
+
+						node["Ca"].read(Ca);
+						node["Xi_b"].read(k_bend_rel);
+
+						// Create particle properties
+						double a_lb = std::sqrt(shape->get_area() / (4. * M_PI));
+
+						// Membrane parameters
+						double G_lb = a_lb * gamma_lb * nu_lb / Ca;
+						double K_bend = k_bend_rel * G_lb * shape->get_area();
+
+						// Store particle
+						RBCParticle<double> * platelet = new RBCParticle<double>(shape, create_platelet_params(shape, G_lb, 0., K_bend));
+						platelet->set_should_voxelize(false);
+						particleTmp.particle = platelet;
 
 					} else if(subType.compare("semirigid") == 0) {
 						// Read platelet properties
@@ -296,6 +313,7 @@ bool read_parameters(ParticleShapeLibrary<double> & shape_library, std::string f
 						// Create semirigid particle
 						SemiRigidParticle3D<double> * particle = new SemiRigidParticle3D<double>(shape, platelet_params);
 						particle->set_center_of_mass(Array<double, 3>(0, 0, 0));
+						particle->set_should_voxelize(false);
 						particleTmp.particle = particle;
 
 					} else {
@@ -415,7 +433,7 @@ void create_particles(
 		fsi.load_checkpoint("checkpoint_fsi");
 	} else {
 		if( ! particleTypes.empty()) {
-			plint Nit = 40000;
+			plint Nit = 100000;
 			T initial_scale = 0.2;
 
 			pcout << "Generating initial distribution" << std::endl;
@@ -427,7 +445,7 @@ void create_particles(
 			// Create a boundary that is a little bit smaller than the actual one,
 			// this ensures that all particles are within the domain
 			PipeBoundary<T> boundary2 = pipe_boundary;
-			boundary2.radius = pipe_boundary.radius - 1.5;
+			boundary2.radius = pipe_boundary.radius - 1;
 
 			plint num_particles = 0;
 			T max_radius = 0;
@@ -523,7 +541,7 @@ void create_particles(
 				fsi2.init();
 
 				// Potential force
-				SpringPotential<T> potential(1., 5e-2);
+				SpringPotential<T> potential(1, 0.5);
 
 				// Grow the particles while under the influence of collision forces
 				T scale;
@@ -532,23 +550,23 @@ void create_particles(
 						pcout << "  Iteration " << it << " / " << Nit << std::endl;
 					//if((it % 500) == 0) fsi2.write_particles_as_vtk(it);
 
-					if((it % 10) == 0) {
-						// Rescale all particles
-						T fraction = (T)it / (T) Nit;
-						scale = initial_scale + (1. - initial_scale)*fraction;
+					// Rescale all particles 
+					T fraction = (T)it / (T) Nit;
+					scale = initial_scale + (1. - initial_scale)*std::pow(fraction, 1./3.);
 
-						for(typename ImmersedBoundaryDynamics3D<T, DESCRIPTOR, Periodicity>::ObjMapIterator iter = fsi2.particles_begin();
-								iter != fsi2.particles_end(); ++iter) {
-							plb::fsi::RigidParticle3D<T> * p = dynamic_cast<plb::fsi::RigidParticle3D<T> *>(iter->second);
-							if(p) {
-								p->scale() = scale;
-								p->update();
-							}
+					if(it == Nit)
+						scale = 1.;
+
+					for(typename ImmersedBoundaryDynamics3D<T, DESCRIPTOR, Periodicity>::ObjMapIterator iter = fsi2.particles_begin();
+							iter != fsi2.particles_end(); ++iter) {
+						plb::fsi::RigidParticle3D<T> * p = dynamic_cast<plb::fsi::RigidParticle3D<T> *>(iter->second);
+						if(p) {
+							p->scale() = scale;
+							p->update();
 						}
-
-						fsi2.synchronize_particle_states();
 					}
 
+					fsi2.synchronize_particle_states();
 					fsi2.compute_collision_forces(potential, &boundary2);
 					fsi2.move_vertices();
 				}

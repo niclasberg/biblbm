@@ -1,10 +1,3 @@
-/*
- * ForceDecorator.h
- *
- *  Created on: Apr 12, 2016
- *      Author: niber
- */
-
 #ifndef FORCEDECORATOR_H_
 #define FORCEDECORATOR_H_
 #include "ParticleBase.h"

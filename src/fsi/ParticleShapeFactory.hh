@@ -126,8 +126,8 @@ void ParticleShapeLibrary<T>::store_mesh(
 {
 	PLB_PRECONDITION(name_id_map.find(tag) == name_id_map.end())
 
-	ParticleShape<T> * shape = new ParticleShape<T>(vertices, indices, num_vertices, num_cells);
 	plint next_id = id_shape_map.size();
+	ParticleShape<T> * shape = new ParticleShape<T>(vertices, indices, num_vertices, num_cells);
 	shape->set_id(next_id);
 	shape->set_tag(tag);
 

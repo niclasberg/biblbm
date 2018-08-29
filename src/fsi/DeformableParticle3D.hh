@@ -74,7 +74,7 @@ void DeformableParticle3D<T>::update()
 		tri::normal_and_area(v0, v1, v2, normal, dA);
 
 		this->area_ += dA;
-		this->volume_ += dot(centroid, normal) * dA / 3.0;
+		this->volume_ += tri::signed_volume(v0, v1, v2);
 		this->center_of_mass_ += centroid * dA;
 	}
 

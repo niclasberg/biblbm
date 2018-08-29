@@ -91,7 +91,8 @@ public:
 
 	// Voxelizer
 	VoxelizerType voxelizer() const { return VoxelizerType(shape_->triangles(), vertices); }
-	virtual bool should_voxelize() const = 0;
+	bool should_voxelize() const { return should_voxelize_; };
+	bool set_should_voxelize(bool val) { should_voxelize_ = val; };
 
 
 	// Vertex iterators
@@ -121,6 +122,7 @@ protected:
 	Array<T, 3> center_of_mass_;
 
 private:
+	bool should_voxelize_;
 	void update_bounding_box();
 
 	const ParticleShape<T> * shape_;

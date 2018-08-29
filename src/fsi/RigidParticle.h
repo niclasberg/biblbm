@@ -32,7 +32,6 @@ public:
 	virtual void reset_forces();
 
 	// Getters
-	virtual bool should_voxelize() const { return false; }
 	Array<T, 3> & velocity() { return velocity_; }
 	const Array<T, 3> & velocity() const { return velocity_; }
 	Array<T, 3> & angular_velocity() { return ang_velocity_; }

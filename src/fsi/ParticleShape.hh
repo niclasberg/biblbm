@@ -39,7 +39,7 @@ ParticleShape<T>::ParticleShape(Array<T, 3> * verts, unsigned int * indices, uns
 		Array<T, 3> centroid;
 		tri::centroid(vertices_[t.i0], vertices_[t.i1], vertices_[t.i2], centroid);
 
-		volume += dot(centroid, normal) * t.area / 3.0;
+		volume += tri::signed_volume(vertices_[t.i0], vertices_[t.i1], vertices_[t.i2]);
 		triangles_.push_back(t);
 
 		center += centroid * t.area;
@@ -149,7 +149,7 @@ void ParticleShape<T>::compute_connectivity()
 	plint i0, i1;
 	AdjacentTrianglePair<T> tri_pair;
 	for(plint i = 0; i < links.size(); ++i) {
-		// Check that the link has two adjacent triangles
+		// Ignore links not connecting triangles
 		if(links[i].t1 == -1 || links[i].t2 == -1)
 			continue;
 

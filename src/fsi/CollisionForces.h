@@ -21,6 +21,35 @@ struct CollisionNode {
 	plint obj_id;
 };
 
+/*struct ParticleCollisionEvent {
+	plint objId1;
+	plint objId2;
+	plint startIteration;
+	plint endIteration;
+
+	bool operator<(const ParticleCollisionEvent & rhs) {
+		if(objId1 < rhs.objId1) 
+			return true;
+		else
+			return objId2 < rhs.objId2;
+	}
+};
+
+class ParticleCollisionEventStorage {
+public:
+	void update(const std::map<plint, plint> & coll_list) 
+	{
+		// The active collisions are sorted by objId1 and then objId2
+		std::set<ParticleCollisionEvent>::iterator activeCollisionsIterator = active_collisions.end();
+		
+	}
+
+private:
+	std::set<ParticleCollisionEvent> active_collisions;
+	std::map<plint, plint> currently_colliding_particles;
+	std::vector<ParticleCollisionEvent> collision_event_buffer; //past collision events
+};*/
+
 /*
  * InteractionFunctional implements the following methods:
  * 	T get_cutoff_distance(): returns the distance after which the force = 0

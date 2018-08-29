@@ -135,15 +135,6 @@ struct BulkInterpolator<T, RomaDirac<T, 3> > {
 		const T dz0 = RomaDirac<T, 3>::eval((T)d_bounds.z0 - pos_rel[2]);
 		const T dz1 = RomaDirac<T, 3>::eval((T)d_bounds.z0 + (T)1. - pos_rel[2]);
 		const T dz2 = RomaDirac<T, 3>::eval((T)d_bounds.z1 - pos_rel[2]);
-		/*const T dx0 = sampled_dirac.eval((T)d_bounds.x0 - pos_rel[0]);
-		const T dx1 = sampled_dirac.eval((T)d_bounds.x0 + (T)1. - pos_rel[0]);
-		const T dx2 = sampled_dirac.eval((T)d_bounds.x1 - pos_rel[0]);
-		const T dy0 = sampled_dirac.eval((T)d_bounds.y0 - pos_rel[1]);
-		const T dy1 = sampled_dirac.eval((T)d_bounds.y0 + (T)1. - pos_rel[1]);
-		const T dy2 = sampled_dirac.eval((T)d_bounds.y1 - pos_rel[1]);
-		const T dz0 = sampled_dirac.eval((T)d_bounds.z0 - pos_rel[2]);
-		const T dz1 = sampled_dirac.eval((T)d_bounds.z0 + (T)1. - pos_rel[2]);
-		const T dz2 = sampled_dirac.eval((T)d_bounds.z1 - pos_rel[2]);*/
 
 		// Get indices
 		// It will henceforth be assumed that d_bounds does not cross over a periodic edge,
