@@ -704,7 +704,7 @@ int main(int argc, char ** argv)
 				*lattice,
 				shape_library);
 
-	fsi.set_boundary(&pipe_boundary);
+	//fsi.set_boundary(&pipe_boundary);
 
 	// Add wall interaction
 	if(wall_interaction)
