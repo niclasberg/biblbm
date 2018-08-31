@@ -24,12 +24,9 @@ void spread_forces_impl(
 		const Box3D & dom,
 		BlockLattice3D<T, Descriptor> & lattice,
 		std::vector<NodeType> & node_container,
-		const Arithmetic & arithmetic,
-		const SampledDirac<T, Dirac, 3> & sampled_dirac)
+		const Arithmetic & arithmetic)
 {
 	Dot3D offset = lattice.getLocation();
-	Box3D d_bounds;
-	T dirac_x, dirac_xy, dirac_xyz;
 
 	for(plint it = 0; it < node_container.size(); ++it) {
 		typename DeduceType<NodeType>::type & node = deref_maybe(node_container[it]);
@@ -37,9 +34,10 @@ void spread_forces_impl(
 		const Array<T, 3> pos_rel(node.pos[0] - offset.x, node.pos[1] - offset.y, node.pos[2] - offset.z);
 
 		// Find compact support region of the Dirac function
+		Box3D d_bounds;
 		get_dirac_compact_support_box<T, Dirac>(pos_rel, d_bounds);
 
-		Spreader::spread(d_bounds, pos_rel, dom, lattice, node, arithmetic, sampled_dirac, offset);
+		Spreader::spread(d_bounds, pos_rel, dom, lattice, node.force, arithmetic, offset);
 	}
 }
 
@@ -53,34 +51,33 @@ void add_to_cArray(T * p, const Array<T, 3> & array)
 
 template<class T, class Dirac>
 struct GeneralSpreading {
-	template<template<typename U> class Descriptor, class Arithmetic, class NodeType>
+	template<template<typename U> class Descriptor, class Arithmetic>
 	static void spread(
 			const Box3D & d_bounds,
 			const Array<T, 3> & pos_rel,
 			const Box3D & dom,
 			BlockLattice3D<T, Descriptor> & lattice,
-			NodeType & node,
+			const Array<T, 3> & force,
 			const Arithmetic & arithmetic,
-			const SampledDirac<T, Dirac, 3> & sampled_dirac,
 			const Dot3D & offset)
 	{
 		for(plint i = d_bounds.x0; i <= d_bounds.x1; ++i) {
 			plint i2 = arithmetic.remap_index_x(i, offset.x);
 			if(i2 < dom.x0 || i2 > dom.x1) continue;
 
-			T dirac_x = sampled_dirac.eval((T)i - pos_rel[0]);
+			T dirac_x = Dirac::eval((T)i - pos_rel[0]);
 			for(plint j = d_bounds.y0; j <= d_bounds.y1; ++j) {
 				plint j2 = arithmetic.remap_index_y(j, offset.y);
 				if(j2 < dom.y0 || j2 > dom.y1) continue;
 
-				T dirac_xy = dirac_x * sampled_dirac.eval((T)j - pos_rel[1]);
+				T dirac_xy = dirac_x * Dirac::eval((T)j - pos_rel[1]);
 				for(plint k = d_bounds.z0; k <= d_bounds.z1; ++k) {
 					plint k2 = arithmetic.remap_index_z(k, offset.z);
 					if(k2 < dom.z0 || k2 > dom.z1) continue;
-					T dirac_xyz = dirac_xy * sampled_dirac.eval((T)k - pos_rel[2]);
+					T dirac_xyz = dirac_xy * Dirac::eval((T)k - pos_rel[2]);
 
 					add_to_cArray(lattice.get(i2, j2, k2).getExternal(Descriptor<T>::ExternalField::forceBeginsAt),
-								dirac_xyz * node.force);
+								dirac_xyz * force);
 				}
 			}
 		}
@@ -90,28 +87,27 @@ struct GeneralSpreading {
 // Optimized spreading (no out of range checks)
 template<class T, class Dirac>
 struct BulkSpreading {
-	template<template<typename U> class Descriptor, class Arithmetic, class NodeType>
+	template<template<typename U> class Descriptor, class Arithmetic>
 	static void spread(
 			const Box3D & d_bounds,
 			const Array<T, 3> & pos_rel,
 			const Box3D & dom,
 			BlockLattice3D<T, Descriptor> & lattice,
-			NodeType & node,
+			const Array<T, 3> & force,
 			const Arithmetic & arithmetic,
-			const SampledDirac<T, Dirac, 3> & sampled_dirac,
 			const Dot3D & offset)
 	{
 		for(plint i = d_bounds.x0; i <= d_bounds.x1; ++i) {
 			plint i2 = arithmetic.remap_index_x(i, offset.x);
-			T dirac_x = sampled_dirac.eval((T)i - pos_rel[0]);
+			T dirac_x = Dirac::eval((T)i - pos_rel[0]);
 			for(plint j = d_bounds.y0; j <= d_bounds.y1; ++j) {
 				plint j2 = arithmetic.remap_index_y(j, offset.y);
-				T dirac_xy = dirac_x * sampled_dirac.eval((T)j - pos_rel[1]);
+				T dirac_xy = dirac_x * Dirac::eval((T)j - pos_rel[1]);
 				for(plint k = d_bounds.z0; k <= d_bounds.z1; ++k) {
 					plint k2 = arithmetic.remap_index_z(k, offset.z);
-					T dirac_xyz = dirac_xy * sampled_dirac.eval((T)k - pos_rel[2]);
+					T dirac_xyz = dirac_xy * Dirac::eval((T)k - pos_rel[2]);
 					add_to_cArray(lattice.get(i2, j2, k2).getExternal(Descriptor<T>::ExternalField::forceBeginsAt),
-								dirac_xyz * node.force);
+								dirac_xyz * force);
 				}
 			}
 		}
@@ -121,27 +117,26 @@ struct BulkSpreading {
 // Optimized spreading for Roma Dirac
 template<class T>
 struct BulkSpreading<T, RomaDirac<T, 3> > {
-	template<template<typename U> class Descriptor, class Arithmetic, class NodeType>
+	template<template<typename U> class Descriptor, class Arithmetic>
 	static void spread(
 			const Box3D & d_bounds,
 			const Array<T, 3> & pos_rel,
 			const Box3D & dom,
 			BlockLattice3D<T, Descriptor> & lattice,
-			NodeType & node,
+			const Array<T, 3> & force,
 			const Arithmetic & arithmetic,
-			const SampledDirac<T, RomaDirac<T, 3>, 3> & sampled_dirac,
 			const Dot3D & offset)
 	{
 		// Evaluate dirac values
-		const T dx[3] = {sampled_dirac.eval((T)d_bounds.x0 - pos_rel[0]),
-						 sampled_dirac.eval((T)d_bounds.x0 + (T)1. - pos_rel[0]),
-						 sampled_dirac.eval((T)d_bounds.x1 - pos_rel[0])};
-		const T dy0 = sampled_dirac.eval((T)d_bounds.y0 - pos_rel[1]);
-		const T dy1 = sampled_dirac.eval((T)d_bounds.y0 + (T)1. - pos_rel[1]);
-		const T dy2 = sampled_dirac.eval((T)d_bounds.y1 - pos_rel[1]);
-		const T dz0 = sampled_dirac.eval((T)d_bounds.z0 - pos_rel[2]);
-		const T dz1 = sampled_dirac.eval((T)d_bounds.z0 + (T)1. - pos_rel[2]);
-		const T dz2 = sampled_dirac.eval((T)d_bounds.z1 - pos_rel[2]);
+		const T dx[3] = {RomaDirac<T, 3>::eval((T)d_bounds.x0 - pos_rel[0]),
+						 RomaDirac<T, 3>::eval((T)d_bounds.x0 + (T)1. - pos_rel[0]),
+						 RomaDirac<T, 3>::eval((T)d_bounds.x1 - pos_rel[0])};
+		const T dy0 = RomaDirac<T, 3>::eval((T)d_bounds.y0 - pos_rel[1]);
+		const T dy1 = RomaDirac<T, 3>::eval((T)d_bounds.y0 + (T)1. - pos_rel[1]);
+		const T dy2 = RomaDirac<T, 3>::eval((T)d_bounds.y1 - pos_rel[1]);
+		const T dz0 = RomaDirac<T, 3>::eval((T)d_bounds.z0 - pos_rel[2]);
+		const T dz1 = RomaDirac<T, 3>::eval((T)d_bounds.z0 + (T)1. - pos_rel[2]);
+		const T dz2 = RomaDirac<T, 3>::eval((T)d_bounds.z1 - pos_rel[2]);
 
 		// Get indices
 		// It will henceforth be assumed that d_bounds does not cross over a periodic edge,
@@ -154,15 +149,15 @@ struct BulkSpreading<T, RomaDirac<T, 3> > {
 		// Spead force
 		for(plint x = 0; x < 3; ++x) {
 			// Unroll the two inner loops
-			add_to_cArray(lattice.get(i0+x, j0,   k0  ).getExternal(forceInd), dx[x] * dy0 * dz0 * node.force);
-			add_to_cArray(lattice.get(i0+x, j0,   k0+1).getExternal(forceInd), dx[x] * dy0 * dz1 * node.force);
-			add_to_cArray(lattice.get(i0+x, j0,   k0+2).getExternal(forceInd), dx[x] * dy0 * dz2 * node.force);
-			add_to_cArray(lattice.get(i0+x, j0+1, k0  ).getExternal(forceInd), dx[x] * dy1 * dz0 * node.force);
-			add_to_cArray(lattice.get(i0+x, j0+1, k0+1).getExternal(forceInd), dx[x] * dy1 * dz1 * node.force);
-			add_to_cArray(lattice.get(i0+x, j0+1, k0+2).getExternal(forceInd), dx[x] * dy1 * dz2 * node.force);
-			add_to_cArray(lattice.get(i0+x, j0+2, k0  ).getExternal(forceInd), dx[x] * dy2 * dz0 * node.force);
-			add_to_cArray(lattice.get(i0+x, j0+2, k0+1).getExternal(forceInd), dx[x] * dy2 * dz1 * node.force);
-			add_to_cArray(lattice.get(i0+x, j0+2, k0+2).getExternal(forceInd), dx[x] * dy2 * dz2 * node.force);
+			add_to_cArray(lattice.get(i0+x, j0,   k0  ).getExternal(forceInd), dx[x] * dy0 * dz0 * force);
+			add_to_cArray(lattice.get(i0+x, j0,   k0+1).getExternal(forceInd), dx[x] * dy0 * dz1 * force);
+			add_to_cArray(lattice.get(i0+x, j0,   k0+2).getExternal(forceInd), dx[x] * dy0 * dz2 * force);
+			add_to_cArray(lattice.get(i0+x, j0+1, k0  ).getExternal(forceInd), dx[x] * dy1 * dz0 * force);
+			add_to_cArray(lattice.get(i0+x, j0+1, k0+1).getExternal(forceInd), dx[x] * dy1 * dz1 * force);
+			add_to_cArray(lattice.get(i0+x, j0+1, k0+2).getExternal(forceInd), dx[x] * dy1 * dz2 * force);
+			add_to_cArray(lattice.get(i0+x, j0+2, k0  ).getExternal(forceInd), dx[x] * dy2 * dz0 * force);
+			add_to_cArray(lattice.get(i0+x, j0+2, k0+1).getExternal(forceInd), dx[x] * dy2 * dz1 * force);
+			add_to_cArray(lattice.get(i0+x, j0+2, k0+2).getExternal(forceInd), dx[x] * dy2 * dz2 * force);
 		}
 	}
 };
@@ -174,10 +169,10 @@ void spread_forces(
 		const Box3D & dom,
 		BlockLattice3D<T, Descriptor> & lattice,
 		std::vector<NodeType> & node_container,
-		const Arithmetic & arithmetic,
-		const SampledDirac<T, Dirac, 3> & sampled_dirac)
+		const Arithmetic & arithmetic)
 {
-	spread_forces_impl<T, Descriptor, Dirac, Arithmetic, NodeType, GeneralSpreading<T, Dirac> >(dom, lattice, node_container, arithmetic, sampled_dirac);
+	spread_forces_impl<T, Descriptor, Dirac, Arithmetic, NodeType, GeneralSpreading<T, Dirac> >(
+		dom, lattice, node_container, arithmetic);
 }
 
 template<class T, template<typename U> class Descriptor, class Dirac, class Arithmetic, class NodeType>
@@ -185,18 +180,15 @@ void spread_forces_bulk(
 		const Box3D & dom,
 		BlockLattice3D<T, Descriptor> & lattice,
 		std::vector<NodeType> & node_container,
-		const Arithmetic & arithmetic,
-		const SampledDirac<T, Dirac, 3> & sampled_dirac)
+		const Arithmetic & arithmetic)
 {
-	spread_forces_impl<T, Descriptor, Dirac, Arithmetic, NodeType, BulkSpreading<T, Dirac> >(dom, lattice, node_container, arithmetic, sampled_dirac);
+	spread_forces_impl<T, Descriptor, Dirac, Arithmetic, NodeType, BulkSpreading<T, Dirac> >(
+		dom, lattice, node_container, arithmetic);
 }
 
-// Boundary spreading. Here we account for that some grid points may lie outside of the domain.
-// A Dirac function will be formed including only the points that are within the domain.
-// The remaining points will be weighted such that the moment conditions:
-//   sum dirac(x-X) = 1
-//   sum (x-X)*dirac(x-X) = 0
-// still hold.
+// Boundary spreading
+// Smoothly switch between the supplied Dirac function and a TopHat dirac when the distance to the boundary gets
+// smaller than the Dirac half support
 template<class T, template<typename U> class Descriptor, class Dirac, class Arithmetic, class NodeType>
 void spread_forces_near_boundary(
 		const Box3D & dom,
@@ -205,45 +197,40 @@ void spread_forces_near_boundary(
 		const Arithmetic & arithmetic,
 		Boundary<T> * boundary)
 {
-	Dot3D offset = lattice.getLocation();
-	Box3D d_bounds;
+	if(! boundary) {
+		spread_forces<T, Descriptor, Dirac, Arithmetic, NodeType>(dom, lattice, node_container, arithmetic);
+	} else {
+		Dot3D offset = lattice.getLocation();
 
-	for(plint it = 0; it < node_container.size(); ++it) {
-		// Dereference NodeType as a reference (it can be either a pointer or a reference)
-		typename DeduceType<NodeType>::type & node = deref_maybe(node_container[it]);
+		for(plint it = 0; it < node_container.size(); ++it) {
+			// Dereference NodeType as a reference (it can be either a pointer or a reference)
+			typename DeduceType<NodeType>::type & node = deref_maybe(node_container[it]);
 
-		// Find compact support region of the Dirac function
-		get_dirac_compact_support_box<T, Dirac>(node.pos, d_bounds);
+			const Array<T, 3> pos_rel(node.pos[0] - offset.x, node.pos[1] - offset.y, node.pos[2] - offset.z);
 
-		// Determine node topology (find points that are outside of the domain)
-		DiracWithMissingPoints<T, Dirac> dirac(node.pos);
-		for(plint i = d_bounds.x0; i <= d_bounds.x1; ++i) {
-			plint i2 = arithmetic.remap_index_x(i);
-			for(plint j = d_bounds.y0; j <= d_bounds.y1; ++j) {
-				plint j2 = arithmetic.remap_index_y(j);
-				for(plint k = d_bounds.z0; k <= d_bounds.z1; ++k) {
-					plint k2 = arithmetic.remap_index_z(k);
-					if( ! boundary->contains(Array<T, 3>((T)i2, (T)j2, (T)k2))) {
-						dirac.setNodeIsValid(i, j, k, false);
-					}
-				}
-			}
-		}
+			Box3D d_bounds, d_bounds_tophat;
+			get_dirac_compact_support_box<T, Dirac>(pos_rel, d_bounds);
+			get_dirac_compact_support_box<T, TopHatDirac<T, 3> >(pos_rel, d_bounds_tophat);
 
-		// Construct Dirac function
-		dirac.computeWeights();
+			// Compute distance to boundary and interpolation weight (linearly decreasing from 1 to 0)
+			T weight = (boundary->distance_to_boundary(node.pos) - Dirac::half_support);
+			
+			if(weight >= 1) {
+				// The node is far away from the boundary, use the supplied Dirac function
+				GeneralSpreading<T, Dirac>::spread(
+					d_bounds, pos_rel, dom, lattice, node.force, arithmetic, offset);
+			} else if(weight <= 0) {
+				// The node is close to the boundary, use the smallest possible Dirac function (top hat)
+				GeneralSpreading<T, TopHatDirac<T, 3> >::spread(
+					d_bounds_tophat, pos_rel, dom, lattice, node.force, arithmetic, offset);
+			} else {
+				// Spread contribution from the supplied Dirac
+				GeneralSpreading<T, Dirac>::spread(
+					d_bounds, pos_rel, dom, lattice, node.force * weight, arithmetic, offset);
 
-		// Spread forces
-		for(plint i=0; i < dirac.count_points(); ++i) {
-			Dot3D p = dirac.get_dirac_point(i).node_pos;
-			p -= offset;
-			plint i2 = arithmetic.remap_index_x(p.x, offset.x);
-			plint j2 = arithmetic.remap_index_y(p.y, offset.y);
-			plint k2 = arithmetic.remap_index_z(p.z, offset.z);
-
-			if(contained(i2, j2, k2, dom)) {
-				add_to_cArray(lattice.get(i2, j2, k2).getExternal(Descriptor<T>::ExternalField::forceBeginsAt),
-						dirac.get_dirac_point(i).weight * dirac.get_dirac_point(i).dirac_val * node.force);
+				// Spread contribution from the TopHat dirac
+				GeneralSpreading<T, TopHatDirac<T, 3> >::spread(
+					d_bounds_tophat, pos_rel, dom, lattice, node.force * (1. - weight), arithmetic, offset);
 			}
 		}
 	}
@@ -271,7 +258,8 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::compute_and_spread_
 	comm_buffer.send_and_receive_no_wait(true);
 
 	// Spread local force
-	spreading::spread_forces_bulk(dom, lattice, local_nodes, arithmetic, sampled_dirac);
+	spreading::spread_forces_bulk<T, Descriptor, Dirac, ArithmeticType, Vertex<T> * >(
+		dom, lattice, local_nodes, arithmetic);
 
 	// Receive non-local nodes
 	comm_buffer.finalize_send_and_receive();
@@ -282,11 +270,16 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::compute_and_spread_
 	}
 
 	// Spread non-local forces and forces in the envelope and boundary
-	spreading::spread_forces(dom, lattice, local_nodes_envelope, arithmetic, sampled_dirac);
-	spreading::spread_forces_bulk(dom, lattice, nonlocal_nodes, arithmetic, sampled_dirac);
-	spreading::spread_forces(dom, lattice, nonlocal_nodes_envelope, arithmetic, sampled_dirac);
-	spreading::spread_forces_near_boundary<T, Descriptor, Dirac, ArithmeticType, Vertex<T> * >(dom, lattice, local_nodes_boundary, arithmetic, boundary);
-	spreading::spread_forces_near_boundary<T, Descriptor, Dirac, ArithmeticType, NonLocalNode<T> >(dom, lattice, nonlocal_nodes_boundary, arithmetic, boundary);
+	spreading::spread_forces<T, Descriptor, Dirac, ArithmeticType, Vertex<T> * >(
+		dom, lattice, local_nodes_envelope, arithmetic);
+	spreading::spread_forces_bulk<T, Descriptor, Dirac, ArithmeticType, NonLocalNode<T> >(
+		dom, lattice, nonlocal_nodes, arithmetic);
+	spreading::spread_forces<T, Descriptor, Dirac, ArithmeticType, NonLocalNode<T> >(
+		dom, lattice, nonlocal_nodes_envelope, arithmetic);
+	spreading::spread_forces_near_boundary<T, Descriptor, Dirac, ArithmeticType, Vertex<T> * >(
+		dom, lattice, local_nodes_boundary, arithmetic, boundary);
+	spreading::spread_forces_near_boundary<T, Descriptor, Dirac, ArithmeticType, NonLocalNode<T> >(
+		dom, lattice, nonlocal_nodes_boundary, arithmetic, boundary);
 	Profile::stop_timer("spread_forces");
 }
 

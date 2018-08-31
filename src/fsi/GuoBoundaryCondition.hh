@@ -138,11 +138,6 @@ template<class T, template<typename U> class Descriptor>
 void GuoRigidWallBoundaryFunctional<T, Descriptor>::process(Box3D domain, BlockLattice3D<T, Descriptor> & lattice)
 {
 	Dot3D offset = lattice.getLocation();
-	T rhoBar1, rhoBar2, rhoBar_w;
-	Array<T, 3> j1, j2, j_w;
-	Array<T, Descriptor<T>::q> fNeq1;
-	Array<T, Descriptor<T>::q> fNeq2;
-	Array<T, Descriptor<T>::q> fNeq_w;
 	plint depth = 2;
 
 	for(typename GuoRigidWallBoundary<T, Descriptor>::iterator it = model_.begin(); it != model_.end(); ++it) {
@@ -161,10 +156,15 @@ void GuoRigidWallBoundaryFunctional<T, Descriptor>::process(Box3D domain, BlockL
 		//	wall_vel[iD] = it->velocity[iD] - (T)0.5*getExternalForceComponent(cell,iD);
 
 		// Evaluate non-equilibrium part of the distribution function
+		Array<T, 3> j1, j2;
+		T rhoBar1, rhoBar2, rhoBar_w;
 		cell1.getDynamics().computeRhoBarJ(cell1, rhoBar1, j1);
 		cell2.getDynamics().computeRhoBarJ(cell2, rhoBar2, j2);
 		T j1sqr = normSqr(j1);
 		T j2sqr = normSqr(j2);
+
+		Array<T, Descriptor<T>::q> fNeq1;
+		Array<T, Descriptor<T>::q> fNeq2;
 		for(plint iPop=0; iPop<Descriptor<T>::q; ++iPop) {
 			fNeq1[iPop] = cell1[iPop] - cell1.getDynamics().computeEquilibrium(iPop, rhoBar1, j1, j1sqr);
 			fNeq2[iPop] = cell2[iPop] - cell2.getDynamics().computeEquilibrium(iPop, rhoBar2, j2, j2sqr);
@@ -173,6 +173,9 @@ void GuoRigidWallBoundaryFunctional<T, Descriptor>::process(Box3D domain, BlockL
 		// Extrapolate wall momentum flux and non-equilibrium part of the distribution
 		rhoBar_w = rhoBar1;
 		Array<T,3> wall_j = Descriptor<T>::fullRho(rhoBar_w) * it->velocity;
+
+		Array<T, 3> j_w;
+		Array<T, Descriptor<T>::q> fNeq_w;
 		if (depth < 2) {
 			j_w = (it->delta < (T)0.25) ? wall_j : (T)1./it->delta * (wall_j+(it->delta-(T)1.)*j1);
 			fNeq_w = fNeq1;

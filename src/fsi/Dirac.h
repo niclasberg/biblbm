@@ -54,12 +54,12 @@ struct TopHatDirac<T, 3> {
 
 	static T eval(T x)
 	{
-		return 1. - std::abs(x);
+		return 1. - std::fabs(x);
 	}
 
 	static T eval(T x, T y, T z)
 	{
-		return (1. - std::abs(x))*(1. - std::abs(y))*(1. - std::abs(z));
+		return (1. - std::fabs(x))*(1. - std::fabs(y))*(1. - std::fabs(z));
 	}
 };
 

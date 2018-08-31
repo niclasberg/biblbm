@@ -332,12 +332,14 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::create_nodes()
 template<class T, template<typename U> class Descriptor, class Periodicity>
 void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::add_nonlocal_node(NonLocalNode<T> & node)
 {
-	if(boundary && boundary->distance_to_boundary_less_than(node.pos, Dirac::half_support))
-		nonlocal_nodes_boundary.push_back(node);
-	else if(bulk_domain.contains(node.pos, arithmetic))
-		nonlocal_nodes.push_back(node);
-	else
-		nonlocal_nodes_envelope.push_back(node);
+	if(domain_with_fsi_envelope.contains(node.pos, arithmetic)) {
+		if(boundary && boundary->distance_to_boundary_less_than(node.pos, Dirac::half_support+1.))
+			nonlocal_nodes_boundary.push_back(node);
+		else if(bulk_domain.contains(node.pos, arithmetic))
+			nonlocal_nodes.push_back(node);
+		else
+			nonlocal_nodes_envelope.push_back(node);
+	}
 }
 
 template<class T, template<typename U> class Descriptor, class Periodicity>
@@ -345,7 +347,7 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::create_nodes_from_p
 {
 	for(typename ParticleBase3D<T>::vertex_iterator it = p.begin(); it != p.end(); ++it) {
 		if(domain_with_fsi_envelope.contains(it->pos, arithmetic)) {
-			if(boundary && boundary->distance_to_boundary_less_than(it->pos, Dirac::half_support))
+			if(boundary && boundary->distance_to_boundary_less_than(it->pos, Dirac::half_support+1.))
 				local_nodes_boundary.push_back(&(*it));
 			else if(bulk_domain.contains(it->pos, arithmetic))
 				local_nodes.push_back(&(*it));

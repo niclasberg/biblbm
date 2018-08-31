@@ -15,8 +15,7 @@ void interpolate_impl(
 		const Box3D & dom,
 		TensorField3D<T, 3> & velocity,
 		std::vector<NodeType> & node_container,
-		const Arithmetic & arithmetic,
-		const SampledDirac<T, Dirac, 3> & sampled_dirac)
+		const Arithmetic & arithmetic)
 {
 	Dot3D offset = velocity.getLocation();
 	Box3D d_bounds;
@@ -34,7 +33,7 @@ void interpolate_impl(
 		node.vel.resetToZero();
 
 		// The actual interpolation is outsourced to the Interpolator
-		Interpolator::interpolate_node(d_bounds, dom, node, velocity, sampled_dirac, arithmetic, offset, pos_rel);
+		Interpolator::interpolate_node(d_bounds, dom, node, velocity, arithmetic, offset, pos_rel);
 	}
 }
 
@@ -49,7 +48,6 @@ struct GeneralInterpolator {
 			const Box3D & dom,
 			NodeType & node,
 			TensorField3D<T, 3> & velocity,
-			const SampledDirac<T, Dirac, 3> & sampled_dirac,
 			const Arithmetic & arithmetic,
 			const Dot3D & offset,
 			const Array<T, 3> & pos_rel)
@@ -90,7 +88,6 @@ struct BulkInterpolator {
 			const Box3D & dom,
 			NodeType & node,
 			TensorField3D<T, 3> & velocity,
-			const SampledDirac<T, Dirac, 3> & sampled_dirac,
 			const Arithmetic & arithmetic,
 			const Dot3D & offset,
 			const Array<T, 3> & pos_rel)
@@ -120,7 +117,6 @@ struct BulkInterpolator<T, RomaDirac<T, 3> > {
 			const Box3D & dom,
 			NodeType & node,
 			TensorField3D<T, 3> & velocity,
-			const SampledDirac<T, RomaDirac<T, 3>, 3> & sampled_dirac,
 			const Arithmetic & arithmetic,
 			const Dot3D & offset,
 			const Array<T, 3> & pos_rel)
@@ -163,10 +159,9 @@ void interpolate_bulk(
 		const Box3D & dom,
 		TensorField3D<T, 3> & velocity,
 		std::vector<NodeType> & node_container,
-		const Arithmetic & arithmetic,
-		const SampledDirac<T, Dirac, 3> & sampled_dirac)
+		const Arithmetic & arithmetic)
 {
-	interpolate_impl<T, Arithmetic, NodeType, Dirac, BulkInterpolator<T, Dirac> >(dom, velocity, node_container, arithmetic, sampled_dirac);
+	interpolate_impl<T, Arithmetic, NodeType, Dirac, BulkInterpolator<T, Dirac> >(dom, velocity, node_container, arithmetic);
 }
 
 template<class T, class Arithmetic, class NodeType, class Dirac>
@@ -174,17 +169,16 @@ void interpolate(
 		const Box3D & dom,
 		TensorField3D<T, 3> & velocity,
 		std::vector<NodeType> & node_container,
-		const Arithmetic & arithmetic,
-		const SampledDirac<T, Dirac, 3> & sampled_dirac)
+		const Arithmetic & arithmetic)
 {
-	interpolate_impl<T, Arithmetic, NodeType, Dirac, GeneralInterpolator<T, Dirac> >(dom, velocity, node_container, arithmetic, sampled_dirac);
+	interpolate_impl<T, Arithmetic, NodeType, Dirac, GeneralInterpolator<T, Dirac> >(dom, velocity, node_container, arithmetic);
 }
 
 
 // Interpolation for nodes close to the boundary
-// Here there's a possibility that fluid nodes lie outside of the domain, and the Dirac function
-// has to operate on fewer points.
-template<class T, template<typename U> class Descriptor, class Arithmetic, class NodeType, class Dirac>
+// We switch smoothly between the supplied Dirac function and a 2-point Dirac function
+// when the distance to the boundary becomes less than the half support of the supplied Dirac
+template<class T, class Arithmetic, class NodeType, class Dirac>
 void interpolate_near_boundary(
 		const Box3D & dom,
 		TensorField3D<T, 3> & velocity,
@@ -193,51 +187,43 @@ void interpolate_near_boundary(
 		Boundary<T> * boundary)
 {
 	Dot3D offset = velocity.getLocation();
-	Box3D d_bounds;
 
-	for(plint it = 0; it < node_container.size(); ++it) {
-		// Dereference NodeType as a reference (it can be either a pointer or a reference)
-		typename DeduceType<NodeType>::type & node = deref_maybe(node_container[it]);
+	if(! boundary) {
+		// No boundary, revert to the GeneralInterpolator
+		interpolate<T, Arithmetic, NodeType, Dirac>(dom, velocity, node_container, arithmetic);
+	} else {
+		for(plint it = 0; it < node_container.size(); ++it) {
+			// Dereference NodeType as a reference (it can be either a pointer or a reference)
+			typename DeduceType<NodeType>::type & node = deref_maybe(node_container[it]);
 
-		// Find compact support region of the Dirac function
-		get_dirac_compact_support_box<T, Dirac>(node.pos, d_bounds);
+			const Array<T, 3> pos_rel(node.pos[0] - offset.x, node.pos[1] - offset.y, node.pos[2] - offset.z);
 
-		// Determine node topology (find points that are outside of the domain)
-		DiracWithMissingPoints<T, Dirac> dirac(node.pos);
-		if(boundary) {
-			for(plint i = d_bounds.x0; i <= d_bounds.x1; ++i) {
-				plint i2 = arithmetic.remap_index_x(i);
-				for(plint j = d_bounds.y0; j <= d_bounds.y1; ++j) {
-					plint j2 = arithmetic.remap_index_y(j);
-					for(plint k = d_bounds.z0; k <= d_bounds.z1; ++k) {
-						plint k2 = arithmetic.remap_index_z(k);
-						// Check if the fluid node or one of its neighbors is contained within the boundary
-						if(! boundary->contains(Array<T, 3>((T)i2, (T)j2, (T)k2))) {
-							geo::Rect<T> neighborhood(i2-1, i2+1, j2-1, j2+1, k2-1, k2+1);
-							if( ! boundary->does_intersect(neighborhood))
-								dirac.setNodeIsValid(i, j, k, false);
-						}
-					}
-				}
-			}
-		}
+			// Find compact support region of the Dirac function
+			Box3D d_bounds, d_bounds_tophat;
+			get_dirac_compact_support_box<T, Dirac>(pos_rel, d_bounds);
+			get_dirac_compact_support_box<T, TopHatDirac<T, 3> >(pos_rel, d_bounds_tophat);
 
-		// Construct Dirac function
-		dirac.computeWeights();
+			// Compute distance to boundary and interpolation weight (linearly decreasing from 1 to 0)
+			T weight = (boundary->distance_to_boundary(node.pos) - Dirac::half_support);
 
-		// Interpolate velocity
-		node.vel.resetToZero();
-		for(plint i=0; i < dirac.count_points(); ++i) {
-			Dot3D p = dirac.get_dirac_point(i).node_pos;
-			p -= offset;
-			plint i2 = arithmetic.remap_index_x(p.x, offset.x);
-			plint j2 = arithmetic.remap_index_y(p.y, offset.y);
-			plint k2 = arithmetic.remap_index_z(p.z, offset.z);
+			if(weight >= 1) {
+				// The node is far away from the boundary, use the supplied Dirac function
+				node.vel.resetToZero();
+				GeneralInterpolator<T, Dirac>::interpolate_node(d_bounds, dom, node, velocity, arithmetic, offset, pos_rel);
+			} else if(weight <= 0) {
+				// The node is close to the boundary, use the smallest possible Dirac function (top hat)
+				node.vel.resetToZero();
+				GeneralInterpolator<T, TopHatDirac<T, 3> >::interpolate_node(d_bounds_tophat, dom, node, velocity, arithmetic, offset, pos_rel);
+			} else {
+				// Compute contribution from the supplied Dirac
+				node.vel.resetToZero();
+				GeneralInterpolator<T, Dirac>::interpolate_node(d_bounds, dom, node, velocity, arithmetic, offset, pos_rel);
+				Array<T, 3> suppliedDiracVelocity = node.vel;
 
-			if(contained(i2, j2, k2, dom)) {
-				node.vel += dirac.get_dirac_point(i).weight *
-						dirac.get_dirac_point(i).dirac_val *
-						velocity.get(i2, j2, k2);
+				// Contribution from the TopHat dirac
+				node.vel.resetToZero(); 
+				GeneralInterpolator<T, TopHatDirac<T, 3> >::interpolate_node(d_bounds_tophat, dom, node, velocity, arithmetic, offset, pos_rel);
+				node.vel = (1.-weight) * node.vel + weight*suppliedDiracVelocity;
 			}
 		}
 	}
@@ -254,10 +240,12 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::interpolate_velocit
 	Profile::start_timer("interpolate");
 
 	// Interpolate non-local node velocity
-	interpolation::interpolate_bulk(dom, velocity, nonlocal_nodes, arithmetic, sampled_dirac);
-	interpolation::interpolate(dom, velocity, nonlocal_nodes_envelope, arithmetic, sampled_dirac);
-	interpolation::interpolate_near_boundary<T, Descriptor, ArithmeticType, NonLocalNode<T>, Dirac>(dom, velocity,
-			nonlocal_nodes_boundary, arithmetic, boundary);
+	interpolation::interpolate_bulk<T, ArithmeticType, NonLocalNode<T>, Dirac>(
+		dom, velocity, nonlocal_nodes, arithmetic);
+	interpolation::interpolate<T, ArithmeticType, NonLocalNode<T>, Dirac>(
+		dom, velocity, nonlocal_nodes_envelope, arithmetic);
+	interpolation::interpolate_near_boundary<T, ArithmeticType, NonLocalNode<T>, Dirac>(
+		dom, velocity, nonlocal_nodes_boundary, arithmetic, boundary);
 
 	for(plint i = dom.x0; i <= dom.x1; ++i)
 		for(plint j = dom.y0; j <= dom.y1; ++j)
@@ -275,10 +263,10 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::interpolate_velocit
 			it->second->get_node(i).vel.resetToZero();
 
 	// Interpolate local
-	interpolation::interpolate_bulk(dom, velocity, local_nodes, arithmetic, sampled_dirac);
-	interpolation::interpolate(dom, velocity, local_nodes_envelope, arithmetic, sampled_dirac);
-	interpolation::interpolate_near_boundary<T, Descriptor, ArithmeticType, Vertex<T> *, Dirac>(dom, velocity,
-			local_nodes_boundary, arithmetic, boundary);
+	interpolation::interpolate_bulk<T, ArithmeticType, Vertex<T> *, Dirac>(dom, velocity, local_nodes, arithmetic);
+	interpolation::interpolate<T, ArithmeticType, Vertex<T> *, Dirac>(dom, velocity, local_nodes_envelope, arithmetic);
+	interpolation::interpolate_near_boundary<T, ArithmeticType, Vertex<T> *, Dirac>(
+			dom, velocity, local_nodes_boundary, arithmetic, boundary);
 	Profile::stop_timer("interpolate");
 
 	// Receive and reduce velocity
