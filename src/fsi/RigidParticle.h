@@ -48,6 +48,8 @@ public:
 	const T & scale() const { return scale_; }
 	T & damping() { return damping_; }
 	const T & damping() const { return damping_; }
+	T & relaxation_factor() { return relaxation_factor_; }
+	const T & relaxation_factor() const { return relaxation_factor_; }
 
 	// Rigid body getters
 	Transform<T> get_fixed_to_world_transform() const;

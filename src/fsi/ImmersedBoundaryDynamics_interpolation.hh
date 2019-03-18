@@ -247,12 +247,12 @@ void ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity>::interpolate_velocit
 	interpolation::interpolate_near_boundary<T, ArithmeticType, NonLocalNode<T>, Dirac>(
 		dom, velocity, nonlocal_nodes_boundary, arithmetic, boundary);
 
-	for(plint i = dom.x0; i <= dom.x1; ++i)
+	/*for(plint i = dom.x0; i <= dom.x1; ++i)
 		for(plint j = dom.y0; j <= dom.y1; ++j)
 			for(plint k = dom.z0; k <= dom.z1; ++k) {
 				if(velocity.get(i, j, k)[0] < -1000)
 					std::cout << "ASDFASDF";
-			}
+			}*/
 
 	// Send to appropriate processors
 	send_interpolation_data();

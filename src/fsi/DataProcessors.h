@@ -138,6 +138,8 @@ private:
 	ImmersedBoundaryDynamics3D<T, Descriptor, Periodicity> & ibm;
 };
 
+
+
 // Specialization
 /*template<class T, class Periodicity>
 class ImmersedBoundaryWrapperFunctional3D : public BoxProcessingFunctional3D_LT<T, ForcedPhaseD3Q19Descriptor, T, 3> {
