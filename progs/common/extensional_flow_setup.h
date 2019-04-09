@@ -9,6 +9,13 @@ inline plb::Array<T, 3> extensionalFlowVelocity(plb::plint iX, plb::plint iY, pl
 	return plb::Array<T, 3>(eps*x, -eps*y, 0);
 }
 
+template<class T>
+inline plb::Array<T, 3> extensionalFlowVelocity(const plb::Array<T, 3> & pos, plb::plint geoNx, plb::plint geoNy, T eps) {
+	const T x = pos[0] - (T)geoNx / 2.;
+	const T y = pos[1] - (T)geoNy / 2.;
+	return plb::Array<T, 3>(eps*x, -eps*y, 0);
+}
+
 ////// ________________________________________________________________
 template <typename T>
 class ExtensionalFlowVelocity {

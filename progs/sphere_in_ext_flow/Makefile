@@ -50,7 +50,7 @@ serialCXX    = gcc
 # Compiler to use with MPI parallelism
 parallelCXX  = /usr/bin/mpicxx
 # General compiler flags (e.g. -Wall to turn on all warnings on g++)
-compileFlags = -fpermissive
+compileFlags = -fpermissive -Wdeprecated-declarations
 # General linker flags (don't put library includes into this flag)
 linkFlags    = 
 # Compiler flags to use when optimization mode is on
