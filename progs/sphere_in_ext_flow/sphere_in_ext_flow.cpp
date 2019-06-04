@@ -144,6 +144,7 @@ int main(int argc, char ** argv)
 
 	// Number of iterations between each write
 	plint output_interval = 200;
+	plint particle_data_output_interval = 10;
 
 	// Input parameters
 	double tau = 0.55; 			// LBM relaxation time
@@ -213,11 +214,28 @@ int main(int argc, char ** argv)
 	// Velocity and concentration fields
 	std::auto_ptr<MultiTensorField3D<double, 3> > velocity = generateMultiTensorField<double, 3>(domain);
 
-	// Add rbc
+	// Add particle
 	fsi.add_particle(&particle);
 
 	// Initialize fsi
 	fsi.init();
+
+	// Open file for particle data output for the current processor
+	std::string outputFileName;
+	{
+		std::stringstream ss;
+		ss << folder << "particleData" << global::mpi().getRank() << ".csv";
+		outputFileName = ss.str();
+	}
+
+	// Check if file exists
+	bool fileExisted = std::ifstream(outputFileName.c_str()).good();
+
+	std::ofstream lightweightOut(outputFileName.c_str(), std::ios_base::app);
+	if( ! fileExisted) {
+		// If file did not already exist, write header
+		lightweightOut << "iteration,x,y,z,ux,uy,uz,Fx,Fy,Fz,Tx,Ty,Tz" << std::endl;
+	}
 
 	pcout << "===============" << std::endl;
 	pcout << "Starting coupled ib-lbm iterations" << std::endl;
@@ -233,6 +251,27 @@ int main(int argc, char ** argv)
 			}
 		}
 		
+		// Write lightweight particle data
+		if((it % particle_data_output_interval) == 0) {
+			ParticleBase3D<double> * pBase;
+			if(fsi.get_particle(0, pBase)) {
+				// Cast to rigid particle
+				RigidParticle3D<double> * p = dynamic_cast<RigidParticle3D<double> *>(pBase);
+				if( ! p) {
+					// This should not happen since the particle should be of type RigidParticle3D
+					std::cout << "Error while while casting particle type to RigidParticle3D" << std::endl;
+					exit(-1);
+				}
+
+				// Write data
+				lightweightOut << it << ","
+					<< p->center_of_mass()[0] << "," << p->center_of_mass()[1] << "," << p->center_of_mass()[2] << "," 
+					<< p->velocity()[0] << "," << p->velocity()[1] << "," << p->velocity()[2] << ","
+					<< p->force()[0] << "," << p->force()[1] << "," << p->force()[2] << ","
+					<< p->torque()[0] << "," << p->torque()[1] << "," << p->torque()[2] << std::endl;
+			}
+		}
+
 		/*if((it % output_interval) == 0) {
 			fsi.write_lightweight_particle_data(it);
 		}*/
