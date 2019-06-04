@@ -122,7 +122,7 @@ using namespace fsi;
 #define DESCRIPTOR descriptors::ForcedD3Q19Descriptor
 
 // Define the periodicity of the domain (periodicity_x, periodicity_y, periodicity_z)
-typedef Periodicity3D<double, true, false, true> Periodicity;
+typedef Periodicity3D<double, false, false, true> Periodicity;
 
 int main(int argc, char ** argv)
 {
